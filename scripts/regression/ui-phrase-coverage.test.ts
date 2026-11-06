@@ -31,6 +31,7 @@ export const ADOPTED: string[] = [
   'app/chart/page.tsx',
   'components/PalaceCell.tsx',
   'components/ChartBoard.tsx',
+  'components/BirthForm.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
@@ -57,6 +58,22 @@ const EXCLUDE = new Set<string>([
   // 化禄/化权/化科/化忌 (ChartBoard.tsx:315-318) cũng KHÔNG ở đây: Task 7 viết chúng qua
   // biTerm(..).zh — .zh là đồng nhất nên key/label vẫn là đúng ký tự Hán để so khớp với engine,
   // còn literal thì nằm trong một lời dịch thay vì xin miễn trừ dù nó chẳng phải nhãn UI.
+  //
+  // R30 (Task 8) — 12 địa chi trong mảng SHICHEN_NAMES (BirthForm.tsx:33). Đây là KHÔNG GIAN
+  // KEY/GIÁ TRỊ của biểu mẫu (index theo canh giờ, giá trị gửi đi phải là Hán tự), không phải
+  // nhãn UI: khai báo mảng là dữ liệu, còn MỌI điểm nó được in ra đều đi qua bảng thuật ngữ —
+  // BirthForm.tsx:117 `biTerm(SHICHEN_NAMES[branch] + '时', 'hour').vi` và :368
+  // `<Bi mode="term" zh={SHICHEN_NAMES[branch] + '时'} kind="hour" />` → '子' hiển thị 'Giờ Tý'.
+  // Thêm 12 dòng UI_VI cho chúng sẽ VI PHẠM R12 (ký tự trần đã là thuật ngữ:
+  // terms.generated.ts '子'='Tý'…; guard ui-phrases.test.ts:45 `UI_VI ∩ hasTerm = ∅` báo ngay),
+  // nên miễn trừ khai báo tường minh từng ký tự, không mẫu regex.
+  // Đo trước khi miễn: grep 12 ký tự trong 4 file ADOPTED chỉ ra BirthForm.tsx:33 + một COMMENT
+  // ở app/chart/page.tsx:27 (comment bị blankComments xóa nên vô hình với extractor) — nghĩa là
+  // không có chỗ nào khác hiện in ký tự trần, nên phần miễn trừ này không che lỗi thật của file
+  // khác. Giới hạn còn lại (ghi chú cho Task 10/11): EXCLUDE khớp theo ký tự, nên sau này một
+  // file ADOPTED mới in trần '午' thì ratchet làm thinh — muốn bắt case đó thì thêm render test,
+  // đừng mở rộng EXCLUDE.
+  '子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥',
 ]);
 
 /**

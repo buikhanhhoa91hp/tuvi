@@ -27,6 +27,27 @@ export const UI_VI: Record<string, string> = {
   '请选择日期': 'Vui lòng chọn ngày',                               // :96
   '年份范围：1900–2026': 'Năm phải trong khoảng 1900–2026',          // :93 (– là U+2013)
 
+  // ── components/BirthForm.tsx — phần còn lại Task 8 wire (mở rộng bảng Task 3) ──
+  // Key lấy nguyên văn từ source (kể cả （） ： – … dấu cách), không đặt lại ký tự nào.
+  '输入生辰八字': 'Nhập ngày giờ sinh',                             // :207 tiêu đề (── … ── là trang trí, nằm ngoài <Bi>)
+  '请输入姓名': 'Vui lòng nhập họ tên',                             // :227 placeholder (attribute → chỉ vế Việt)
+  '年份': 'Năm',                                                   // :247 <option> không nhận con → vế Việt
+  '月份': 'Tháng',                                                 // :261
+  '日期': 'Ngày',                                                  // :275
+  '省份 / 直辖市': 'Tỉnh / thành phố trực thuộc',                    // :296
+  '城市': 'Thành phố',                                              // :309
+  '先选省份': 'Chọn tỉnh trước',                                     // :309
+  '经度': 'Kinh độ',                                               // :324 dòng thông tin kinh độ/lệch giờ
+  '时差': 'Lệch giờ',                                              // :324
+  '分钟': 'phút',                                                  // :324
+  '时辰不详': 'Canh giờ không rõ',                                   // :117 summary chip (một dòng → vế Việt)
+  '真太阳时': 'Giờ thật–mặt trời',                                   // :366 nhãn kết quả
+  '不知道出生时间，以子时（23:00–01:00）起盘':
+    'Không rõ giờ sinh — lập lá số theo giờ Tý (23:00–01:00)',        // :385 checkbox
+  '性别': 'Giới tính',                                              // :392 nhãn
+  '紫微起盘中…': 'Đang lập lá số Tử Vi…',                            // :483 nút loading
+  '立即起盘 · 解命运密码': 'Lập lá số · Giải mã vận mệnh',             // :485 nút submit
+
   // ── components/ChartBoard.tsx (số dòng sau Task 7, khi mỗi chuỗi đã nằm trong <Bi>) ──
   '紫微斗数命盘': 'Lá số Tử Vi',                                   // :122
   '紫微斗数': 'Tử Vi đẩu số',                                       // :176
@@ -75,6 +96,9 @@ export const UI_FMT_VI: Record<string, string> = {
   '{y}年{m}月{d}日': '{d}/{m}/{y}',                   // BirthForm.tsx:115 (call site pad: '15/06/1990')
   '{m}月没有{d}日': 'Ngày {d} không có trong tháng {m}', // BirthForm.tsx:97 (không pad: 'tháng 2', không phải 'tháng 02')
   '{m} 月': 'Tháng {m}',                               // BirthForm.tsx:263 `<option>{mo} 月</option>` (dấu cách U+0020 trước 月)
+  '{n} 日': 'Ngày {n}',                                // BirthForm.tsx:277 `<option>{dy} 日</option>` (Task 8)
+  '{n} 时': '{n} giờ',                                 // BirthForm.tsx:351 `<option>08 时</option>` (call site pad, R17)
+  '{n} 分': '{n} phút',                                // BirthForm.tsx:360 `<option>00 分</option>` (call site pad, R17)
   '{n}岁': '{n} tuổi',                                 // chưa có call site nào; ChartBoard dùng dạng HAI số, khai báo riêng bên dưới (R7)
   // ChartBoard.tsx:211 (TRƯỚC Task 7) viết `<div>{dx.startAge}–{dx.endAge}岁</div>` — JSX text
   // CHEN biểu thức nên extractor không thấy nó (R29a, blind spot có chủ đích). Task 7 đổi sang
