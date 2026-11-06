@@ -37,8 +37,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // lang="vi": tieng Viet la ngon ngu hien thi chinh (Task 9). metadata.locale
+  // van giu 'zh_CN' — SEO metadata dich thuoc dot C, khong doi bo lop o day.
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('ziwei-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);else document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();` }} />
       </head>
