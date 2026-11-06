@@ -378,8 +378,10 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
   { zh: '晚子时', vi: 'Giờ Tý muộn', kind: 'hour', note: 'common.json vi-VN: lateRatHour' },
 
   // ── (b) mục iztro dịch lỗi, ghi lại để người dùng biết mà soát ──
-  { zh: '童年', vi: 'Đồng Hạn', kind: 'misc',
-    note: "iztro common.json: childhood → 'đứa trẻ Hạn' (trật từ sai, rõ là máy dịch). 'Đồng Hạn' là thuật ngữ Việt cho 童限/童年." },
+  { zh: '童限', vi: 'Đồng Hạn', kind: 'misc',
+    note: "iztro zh-CN/common.json childhood = 童限 (ĐÃ KIỂM CHỨNG, không phải 童年); vi-VN trả " +
+          "'đứa trẻ Hạn' — trật từ sai, rõ là máy dịch. common.json không được sync (R5) nên " +
+          "override là đường duy nhất đưa mục này vào bảng." },
 ];
 
 /** Tra theo kind: chỉ mục cùng kind mới được xét tới. */
