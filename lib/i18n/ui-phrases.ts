@@ -530,6 +530,39 @@ export const UI_VI: Record<string, string> = {
   '倪师注': 'Chú của Ni sư',
   '← 上一章': '← Chương trước',
   '下一章 →': 'Chương sau →',
+
+  // ── Task c4 — app/heming/page.tsx (trang hop ban /heming) ──
+  // Chrome cua page thay Hán bang tieng Viet (R30, biText(...).vi — khong dung
+  // <Bi mode="text"> de khoi in kem dong Hán thu hai). '紫微合盘' (:366) và
+  // '开始合盘分析' (:374) da co tu muc 合盘入口 cua trang chu — tai su dung.
+  // Van ban ket qua (SSE tu /api/heming) va du lieu thuat ngu LA DATA, khong o day.
+  '返回': 'Quay lại',                                                // :182 nut ve trang chu
+  '合盘分析': 'Phân tích hợp bàn',                                   // :185 nhan tren header
+  '感情 · 合伙 · 亲子 · 朋友': 'Tình cảm · Hùn hạp · Cha mẹ – con cái · Bạn bè', // :187
+  '输入两个人的出生信息，AI 基于倪海厦体系分析双方命盘的缘分匹配度、感情走向与相处建议':
+    'Nhập thông tin ngày sinh của hai người; AI theo hệ Ni Hải Hạ phân tích độ hợp duyên giữa hai lá số, xu hướng tình cảm và gợi ý chung sống.', // :199
+  '甲方 — A': 'Bên A — A',                                           // :209 nhan form ben A
+  '乙方 — B': 'Bên B — B',                                           // :219 nhan form ben B
+  '合盘分析 · HEMING': 'Phân tích hợp bàn · HEMING',                  // :240
+  '填好双方出生信息后，点击下方按钮':
+    'Sau khi điền xong thông tin ngày sinh của hai người, nhấn nút bên dưới', // :247
+  'AI 将基于倪海厦体系深度分析两人缘分匹配度':
+    'AI sẽ phân tích sâu độ hợp duyên giữa hai người theo hệ Ni Hải Hạ', // :248
+  '正在对比双方命盘…': 'Đang so sánh hai lá số…',                      // :280
+  '请先填写双方完整出生信息': 'Vui lòng điền đầy đủ thông tin ngày sinh của cả hai người', // :91 formError
+  '开源版不含合盘 AI 分析接口（/api/heming），需要你自己实现后才能用。两人的命盘可以分别到「排盘」页（/chart）查看。':
+    'Bản mã nguồn mở không kèm API phân tích hợp bàn AI (/api/heming) — bạn cần tự triển khai thì mới dùng được. Lá số của từng người có thể xem riêng ở trang Lập lá số (/chart).', // :289
+  '分析暂时不可用，请重试。': 'Phân tích tạm thời không khả dụng, vui lòng thử lại.', // :290
+  '针对此次合盘继续追问': 'Đặt thêm câu hỏi về lần hợp bàn này',        // :299
+  '感情匹配度如何？': 'Độ hợp tình cảm ra sao?',                       // :305 nut hoi nhanh
+  '适合合伙创业吗？': 'Có phù hợp hùn hạp khởi nghiệp không?',          // :306
+  '两人结婚是否合适？': 'Hai người kết hôn có hợp không?',              // :307
+  '哪方面最容易产生矛盾？': 'Phương diện nào dễ phát sinh mâu thuẫn nhất?', // :308
+  '财运是否互补？': 'Tài vận có bù trừ cho nhau không?',                // :309
+  '继续追问，如：哪几年是两人感情关键期？':
+    'Đặt thêm câu hỏi, ví dụ: năm nào là giai đoạn then chốt trong tình cảm của hai người?', // :340 placeholder
+  '分析中…': 'Đang phân tích…',                                       // :357
+  '继续追问': 'Đặt câu hỏi tiếp',                                      // :357
 };
 
 /**

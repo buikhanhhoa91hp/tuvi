@@ -50,6 +50,10 @@ export const ADOPTED: string[] = [
   'app/library/search/page.tsx',
   'app/library/[book]/page.tsx',
   'app/library/[book]/[chapter]/page.tsx',
+  // Task c4: trang hop ban /heming. Chrome cua page dich sang tieng Viet qua
+  // biText(...).vi (R30). Van ban ket qua tu SSE /api/heming va noi dung co tich/
+  // du lieu thuat ngu khong thuoc page nay -> khong doi.
+  'app/heming/page.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
