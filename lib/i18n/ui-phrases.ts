@@ -392,6 +392,87 @@ export const UI_VI: Record<string, string> = {
     'Không cấu thành khuyến nghị y khoa, đầu tư, pháp lý hay quyết định hệ trọng nào.',
   '服务条款': 'Điều khoản dịch vụ',
   '隐私政策': 'Chính sách bảo mật',
+
+  // ══ app/knowledge/* (task c2) — trang kien thuc ═════════════════════
+  // R30: van trang → TIENG VIET THAY THE CHU HAN qua biText(...).vi; chuoi noi suy
+  // → UI_FMT_VI + biFmt (placeholder CO TEN). Metadata/JSON-LD SEO GIU NGUYEN Hán
+  // (dua theo phan quyet commit e0e2140) → mien EXCLUDE/TEMPLATE_OK trong ratchet.
+  // Ten sao/cung du lieu → biTerm(...).vi (bang thuat ngu, R12 cam trung key UI_VI).
+
+  // ── dieu huong (2 page dung chung) ──
+  '← 首页': '← Trang chủ',
+  '首页': 'Trang chủ',
+  '知识库': 'Kho tri thức',
+  '倪师方法论 · 知识库': 'Phương pháp Ni sư · Kho tri thức',
+  '古籍 →': 'Kho cổ thư →',
+  '起盘 →': 'Lập lá số →',
+  '立即起盘 →': 'Lập lá số ngay →',
+
+  // ── app/knowledge/page.tsx — hero + danh sach ──
+  '紫微斗数知识库': 'Kho tri thức Tử Vi đẩu số',
+  '14 主星 × 13 宫位 =': '14 chính tinh × 13 cung =',
+  '项专题': 'chuyên đề',
+  '基于倪海厦《天纪》体系编纂 · 含古籍引证': 'Biên soạn theo hệ Thiên Kỷ của thầy Ni Hải Hạ · kèm dẫn chứng cổ thư',
+  '十四主星': '14 Chính tinh',
+
+  // ── TOPIC_LABEL (lib/ziwei/db-analysis.ts:34, du lieu — khong sua file data;
+  //    trang goi biText(TOPIC_LABEL[t]).vi luc render). '命格总览'/'性格特质' da co o tren. ──
+  '感情婚姻': 'Tình cảm hôn nhân',
+  '事业职业': 'Sự nghiệp nghề nghiệp',
+  '财富运势': 'Tài vận',
+  '健康状况': 'Tình trạng sức khỏe',
+  '兄弟合伙': 'Anh em hợp tác',
+  '子女缘分': 'Duyên con cái',
+  '迁移外出': 'Di chuyển xuất ngoại',
+  '人际贵人': 'Quý nhân giao tế',
+  '田宅不动产': 'Điền trạch – bất động sản',
+  '精神福德': 'Tinh thần phúc đức',
+  '父母长辈': 'Cha mẹ bề trên',
+
+  // ── app/knowledge/[star]/[topic]/page.tsx — nhan 4 doan luan + CTA + footer ──
+  '一句话定调': 'Định luận một câu',
+  '核心论断': 'Luận đoạn cốt lõi',
+  '命盘依据': 'Căn cứ trên lá số',
+  '经典出处': 'Xuất xứ kinh điển',
+  '输入生辰起盘 · 倪师正宗解读 · AI 答疑伴学': 'Nhập ngày giờ sinh để lập lá số · chính truyền Ni Hải Hạ luận giải · AI giải đáp đồng hành',
+  '想读原典？': 'Muốn đọc nguyên bản?',
+  '📜 查阅古籍原典库 — 紫微斗数全集 / 全书 / 骨髓赋 →':
+    '📜 Vào kho cổ thư nguyên bản — Tử Vi Đẩu Số Toàn Tập / Toàn Thư / Cốt Tủy Phú →',
+  '紫微研究 · 基于倪海厦正宗体系 · 仅供学习参考':
+    'Nghiên cứu Tử Vi · theo chính truyền Ni Hải Hạ · chỉ dùng để tham khảo học tập',
+  '本平台不构成任何医疗、投资、法律或重大决策建议':
+    'Nền tảng này không cấu thành bất kỳ khuyến nghị y khoa, đầu tư, pháp lý hay quyết định hệ trọng nào',
+
+  // ── STAR_BRIEF_SEO (lib/seo/knowledge.ts:147, du lieu — khong sua file data;
+  //    trang goi biText(STAR_BRIEF_SEO[star] || '').vi luc render). ──
+  '紫微为帝星，主尊贵，化气为尊。落命主有领导气场、宜大平台高位。':
+    'Tử Vi là Đế tinh, chủ tôn quý, hóa khí là tôn. Người tọa Mệnh có khí chất lãnh đạo, hợp vị trí cao trên nền tảng lớn.',
+  '天机为智慧星，主善变机灵，化气为善。落命主聪明机变、宜辅佐策划。':
+    'Thiên Cơ là sao Trí tuệ, chủ linh lợi biết biến hóa, hóa khí là thiện. Người tọa Mệnh thông minh cơ biến, hợp phụ tá, hoạch định.',
+  '太阳为男贵星，主名誉公务，化气为贵。落命主光明磊落、宜公职名声。':
+    'Thái Dương là quý tinh của nam, chủ danh dự công vụ, hóa khí là quý. Người tọa Mệnh quang minh lỗi lạc, hợp công chức và tiếng tăm.',
+  '武曲为财星，主刚毅果决，化气为财。落命主理财能力强、宜实业金融。':
+    'Vũ Khúc là sao Tài, chủ cương nghị quả quyết, hóa khí là tài. Người tọa Mệnh giỏi quản tài, hợp thực nghiệp và tài chính.',
+  '天同为福星，主温和享乐，化气为福。落命主性情温和、有福气。':
+    'Thiên Đồng là Phúc tinh, chủ ôn hòa hưởng lạc, hóa khí là phúc. Người tọa Mệnh tính tình ôn hòa, có phúc khí.',
+  '廉贞为次桃花星，文武兼备，化气为囚。落命主多才多艺、感情丰富。':
+    'Liêm Trinh là thứ đào hoa tinh, văn võ song toàn, hóa khí là tù. Người tọa Mệnh đa tài đa nghệ, tình cảm phong phú.',
+  '天府为南帝守财星，主稳重保守，化气为令。落命主品行端正、善守财库。':
+    'Thiên Phủ là Nam Đế thủ tài tinh, chủ trầm ổn bảo thủ, hóa khí là lệnh. Người tọa Mệnh phẩm hạnh đoan chính, giỏi giữ tài khố.',
+  '太阴为月亮富贵星，主田宅富贵，化气为富。落命主感情细腻、女命最吉。':
+    'Thái Âm là phú quý tinh của mặt trăng, chủ điền trạch phú quý, hóa khí là phú. Người tọa Mệnh tình cảm tế nhị, nữ mệnh đại cát.',
+  '贪狼为桃花欲望星，多才多社交，化气为桃花。落命主多才艺、社交广。':
+    'Tham Lang là đào hoa dục vọng tinh, đa tài hay giao tế, hóa khí là đào hoa. Người tọa Mệnh nhiều tài nghệ, giao thiệp rộng.',
+  '巨门为是非口才星，主辩论传媒，化气为暗。落命主口才好、宜律师教师。':
+    'Cự Môn là sao thị phi khẩu tài, chủ biện luận truyền thông, hóa khí là ám. Người tọa Mệnh ăn nói giỏi, hợp luật sư và giáo viên.',
+  '天相为印星辅佐，主忠厚老实，化气为印。落命主品行端正、宜行政法务。':
+    'Thiên Tướng là Ấn tinh phụ tá, chủ trung hậu thật thà, hóa khí là ấn. Người tọa Mệnh phẩm hạnh đoan chính, hợp hành chính và pháp vụ.',
+  '天梁为老人星荫星，善逢凶化吉，化气为荫。落命主慈悲善良、宜法律医学。':
+    'Thiên Lương là Lão nhân tinh / Ẩm tinh, giỏi gặp dữ hóa lành, hóa khí là ẩm. Người tọa Mệnh từ bi lương thiện, hợp pháp luật và y khoa.',
+  '七杀为将星，主孤独果决冒险，化气为肃杀。落命主刚毅果决、宜军警创业。':
+    'Thất Sát là Tướng tinh, chủ cô độc quả quyết mạo hiểm, hóa khí là túc sát. Người tọa Mệnh cương nghị quả quyết, hợp quân cảnh và khởi nghiệp.',
+  '破军为破坏创新星，主六亲缘薄，化气为耗。落命主开创变动、宜技术专长。':
+    'Phá Quân là sao phá cũ lập mới, chủ duyên với lục thân mỏng, hóa khí là hao. Người tọa Mệnh khai sáng nhiều biến động, hợp kỹ thuật chuyên môn.',
 };
 
 /**
@@ -434,4 +515,17 @@ export const UI_FMT_VI: Record<string, string> = {
   // app/page.tsx footer card: `${s.when} 开放` → biFmt('{when} 开放', { when: s.when }).vi
   // (s.when đã là 'Tháng 6' nên vế Việt ghép tự nhiên; placeholder CÓ TÊN theo R14).
   '{when} 开放': '{when} mở',
+
+  // ── app/knowledge/* (task c2) ──
+  // Muc dung chung: placeholder `z`-ben tren (sz/pz/tl) dien nguyên văn Hán để vế zh
+  // tái hiện đúng chuỗi trang từng in; placeholder `v`-ben (sv/pv/tv) dien ten thuat
+  // ngu/câu Việt (biTerm/biText tai call site) — cùng kiểu '{z}·{s}年四化：' của TimeNav.
+  // viTerm('命宫')='Mệnh'… (khong co tu 'cung' trong bảng) nên vế Việt thêm 'cung' ở đây.
+  '入{pz} · {tl}': 'Nhập cung {pv} · {tv}',           // app/knowledge/page.tsx chip topic
+  '{sz}入{pz}宫': '{sv} nhập cung {pv}',              // [topic]/page.tsx h1
+  '{sz}入{pz}': '{sv} nhập cung {pv}',                // [topic]/page.tsx 2 khối internal-link
+  '{tl} · 倪海厦体系详解': '{tv} · chi tiết theo hệ Ni Hải Hạ', // [topic]/page.tsx kicker
+  '想看你自己命盘的{tl}？': 'Muốn xem {tv} trên chính lá số của bạn?', // [topic]/page.tsx CTA
+  '{sz}星的其他宫位解读': 'Luận giải các cung khác của sao {sv}',       // [topic]/page.tsx Section
+  '其他主星入{pz}宫的解读': 'Luận giải các chính tinh khác nhập cung {pv}', // [topic]/page.tsx Section
 };

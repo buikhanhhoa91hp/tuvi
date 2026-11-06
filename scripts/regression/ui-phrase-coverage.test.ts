@@ -39,6 +39,9 @@ export const ADOPTED: string[] = [
   // Task c1: trang chu (landing page). Rule R30 - Vietnamese REPLACE Chinese
   // via biText(...).vi inline, not <Bi mode="text">.
   'app/page.tsx',
+  // Task c2: trang kien thuc (SEO Knowledge pages)
+  'app/knowledge/page.tsx',
+  'app/knowledge/[star]/[topic]/page.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
@@ -81,6 +84,29 @@ const EXCLUDE = new Set<string>([
   // file ADOPTED mới in trần '午' thì ratchet làm thinh — muốn bắt case đó thì thêm render test,
   // đừng mở rộng EXCLUDE.
   '子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥',
+
+  // R30-dot-Task-c2 — SEO HEAD + JSON-LD CUA /knowledge ( Metadata title/description/
+  // keywords va cau truc Article trong app/knowledge/[star]/[topic]/page.tsx).
+  // Phat quyet e0e2140 ("metadata SEO giu nguyen"): noi dung trong <head> va JSON-LD
+  // KHONG doi khi doi ngon ngu hien thi — no la tu khoa tim kiem nguoi dung goi bang
+  // tieng Trung, khong phai van ban UI. Mien tung chuoi nguyen van, co ly do, KHONG
+  // dung pattern. Canh bao nhu 12 dia chi o tren: EXCLUDE khop toan cuc, nen mot file
+  // ADOPTED tuong lai in tran '紫微斗数' tren MAN Se cung lot luoi — bat case do bang
+  // render test, dung mo rong EXCLUDE.
+  '紫微斗数',        // ly do: tu khoa SEO (metadata keywords + JSON-LD keywords), giu nguyen van
+  '倪海厦',          // ly do: tu khoa SEO (ten tac gia trong metadata keywords), giu nguyen van
+  '倪海厦紫微斗数',  // ly do: cum tu khoa SEO, giu nguyen van
+  '紫微斗数全集',    // ly do: ten co thu + tu khoa SEO, giu nguyen van
+  '紫微斗数全书',    // ly do: ten co thu + tu khoa SEO, giu nguyen van
+  '14 主星',         // ly do: tu khoa SEO (metadata keywords), giu nguyen van
+  '12 宫位',         // ly do: tu khoa SEO (metadata keywords), giu nguyen van
+  // ly do 3 dong duoi: metadata title/description cua /knowledge + JSON-LD Article
+  // (SEO structured data) — giu nguyen van theo phan quyet e0e2140.
+  '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系',
+  '基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。',
+  '紫微研究 · 倪海厦正宗', // ly do: JSON-LD author.name, giu nguyen van
+  '紫微研究',        // ly do: JSON-LD publisher.name, giu nguyen van
+  '紫微斗数 · 倪海厦体系', // ly do: JSON-LD articleSection, giu nguyen van
 ]);
 
 /**
@@ -110,6 +136,14 @@ const EXCLUDE = new Set<string>([
  */
 const TEMPLATE_OK = new Set<string>([
   // Rat: Task 7 ve duong (a) (Bi mode="fmt" + key UI_FMT_VI) nen khong dong nao o day.
+  // Task c2 — template literal TRONG metadata/JSON-LD cua /knowledge/[star]/[topic]:
+  // SEO giu nguyen van (phan quyet e0e2140), khai bao tuong minh tung nguyen van source
+  // theo dung co che R7 duong (b). KHONG phai van ban UI: generateMetadata + Article LD.
+  '${star}入${data.palaceName}宫 · ${data.topicLabel} · 倪海厦体系详解', // :46 metadata title
+  '${star}入${data.palaceName}宫的紫微斗数解读 — 基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》。', // :48 metadata description
+  '${star}入${data.palaceName}',           // :64 metadata keywords
+  '紫微斗数 ${star}',                       // :65 metadata keywords
+  '${star}入${data.palaceName}宫 · ${data.topicLabel}', // :86 JSON-LD headline
 ]);
 
 /**
