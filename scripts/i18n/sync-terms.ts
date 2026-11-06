@@ -46,23 +46,42 @@ for (const ns of NAMESPACES) {
 
 // Biến thể có hậu tố: dữ liệu repo dùng dạng đầy đủ, iztro dùng dạng ngắn.
 // 兄弟 (iztro) nhưng constants.ts:25 lại là '兄弟宫'.  子 (iztro) nhưng SHICHEN là '子时'.
+// Không vòng hậu tố nào được drop im lặng: mọi mục không thêm được phải đếm vào skippedSuffix.
+// trong đó suffixGuardFails là tín hiệu nguy hiểm (iztro CJK-hóa/đổi tên dữ liệu) — chính là
+// lớp lỗi "biến thể 宫 biến mất" round 0 vừa sửa.
 let suffixVariants = 0;
+let skippedSuffix = 0;
+let suffixGuardFails = 0;
+const suffixGuardReport: string[] = [];
+const skipSuffix = (why: 'guard' | 'already', reason: string) => {
+  skippedSuffix++;
+  if (why === 'guard') { suffixGuardFails++; suffixGuardReport.push(reason); }
+};
+
 const palaces = require(`${BASE}/zh-CN/palace.js`).default as Record<string, string>;
 const palaceVi = require(`${BASE}/vi-VN/palace.js`).default as Record<string, string>;
 for (const key of Object.keys(palaces)) {
   const zhVal = palaces[key];
   const viVal = palaceVi[key];
+  // Giống vòng chính (:35): thiếu bản dịch Việt thì dừng lại, đừng ghi 'undefined' vào bảng.
+  if (viVal === undefined) throw new Error(`iztro: key ${key} có ở zh-CN/palace nhưng thiếu ở vi-VN/palace`);
   // Guard giống vòng chính: khóa Hán phải có chữ Hán, giá trị Việt phải là Latin.
-  if (!CJK.test(zhVal) || CJK.test(viVal)) continue;
+  if (!CJK.test(zhVal) || CJK.test(viVal)) { skipSuffix('guard', `palace:${key} '${zhVal}' → '${viVal}'`); continue; }
   const full = zhVal.endsWith('宫') ? zhVal : zhVal + '宫';
-  if (full !== zhVal && !table.has(full)) { table.set(full, viVal); suffixVariants++; }
+  if (full === zhVal) { skipSuffix('already', `palace:${key} '${zhVal}' iztro đã cho dạng đầy đủ`); continue; }
+  if (table.has(full)) { skipSuffix('already', `palace:${key} '${full}' đã có trong bảng`); continue; }
+  table.set(full, viVal); suffixVariants++;
 }
 const branches = require(`${BASE}/zh-CN/earthlyBranch.js`).default as Record<string, string>;
 const branchVi = require(`${BASE}/vi-VN/earthlyBranch.js`).default as Record<string, string>;
 for (const key of Object.keys(branches)) {
   const zhVal = branches[key];
+  const viVal = branchVi[key];
+  if (viVal === undefined) throw new Error(`iztro: key ${key} có ở zh-CN/earthlyBranch nhưng thiếu ở vi-VN/earthlyBranch`);
   const hour = zhVal + '时';
-  if (!table.has(hour)) { table.set(hour, `Giờ ${branchVi[key]}`); suffixVariants++; }
+  if (!CJK.test(zhVal) || CJK.test(viVal)) { skipSuffix('guard', `branch:${key} '${zhVal}' → '${viVal}'`); continue; }
+  if (table.has(hour)) { skipSuffix('already', `branch:${key} '${hour}' đã có trong bảng`); continue; }
+  table.set(hour, `Giờ ${viVal}`); suffixVariants++;
 }
 
 const conflicts = [...conflictMap.entries()].map(([zh, winners]) => ({ zh, winners }));
@@ -83,7 +102,11 @@ ${body}
 };
 `, 'utf8');
 
-console.log(`✓ ${OUT}: ${sorted.length} mục, ${suffixVariants} biến thể hậu tố, bỏ ${skippedNoCjk} mục Việt còn chữ Hán`);
+console.log(`✓ ${OUT}: ${sorted.length} mục, ${suffixVariants} biến thể hậu tố, bỏ ${skippedNoCjk} mục Việt còn chữ Hán, bỏ ${skippedSuffix} mục ở vòng hậu tố (đang có sẵn ${skippedSuffix - suffixGuardFails}, guard CJK từ chối ${suffixGuardFails})`);
+if (suffixGuardFails) {
+  console.log(`! ${suffixGuardFails} mục hậu tố bị guard CJK từ chối — iztro có vẻ đã đổi/CJK-hóa dữ liệu, biến thể 宫/时 có thể đã mất:`);
+  for (const r of suffixGuardReport.slice(0, 14)) console.log(`    ${r}`);
+}
 if (conflicts.length) {
   console.log(`! ${conflicts.length} xung đột cùng khóa Hán (đã giữ lần gặp đầu, cần quyết định trong terms.override.ts):`);
   for (const c of conflicts.slice(0, 12)) console.log(`    ${c.zh}: ${c.winners.map((w) => w.key).join(' | ')}`);
