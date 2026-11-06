@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "terms:sync": "tsx scripts/i18n/sync-terms.ts",
+    "terms:report": "tsx scripts/i18n/report-terms.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
