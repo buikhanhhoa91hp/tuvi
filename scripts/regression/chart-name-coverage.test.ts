@@ -3,17 +3,49 @@
  * Fail sẽ in đúng danh sách thiếu — đó là "danh sách từ cần xử lý" mà spec mục 3.4 hứa.
  */
 import { generateChart } from '../../lib/ziwei/algorithm';
-import { hasTerm } from '../../lib/i18n/resolve';
+import { hasTerm, viPillar } from '../../lib/i18n/resolve';
 import { SCHOOL_STAR_ID_TO_NAME } from '../../lib/ziwei/school-data';
 import { STEMS, BRANCHES, SHICHEN, PALACE_NAMES_ORDER, JU_NAMES, STAR_DESCRIPTIONS } from '../../lib/ziwei/constants';
+import type { ZiweiChart } from '../../lib/ziwei/types';
+
+/**
+ * Interface đã hứa với Task 10 (báo cáo từ khó): gom MỌI nhãn Hán một lá số phát ra.
+ * Không gồm fourPillars/fourPillarsLunar — can chi ghép 60 tổ hợp không phải từ bảng,
+ * bên quét dưới chạy qua viPillar (tách can+chi), đưa vào đây sẽ đòi 60 dòng bảng giả.
+ */
+export function collectChartNames(chart: ZiweiChart): string[] {
+  const out: string[] = [];
+  const push = (n: string | undefined) => { if (n) out.push(n); };
+  push(chart.wuxingJuName);
+  push(chart.mingZhu);
+  push(chart.shenZhu);
+  push(chart.yinYangGender);
+  for (const p of chart.palaces) {
+    push(p.name);
+    push(p.borrowedFromName);
+    for (const s of p.stars) {
+      push(s.name);
+      push(s.brightnessRaw);
+      push(s.siHua);
+    }
+  }
+  for (const dx of chart.daXians) push(dx.palaceName);
+  return out;
+}
 
 const missing = new Set<string>();
 const check = (name: string | undefined, where: string) => {
   if (!name) return;
   if (!hasTerm(name)) missing.add(`${name}  (${where})`);
 };
+// Thiếu nửa can/chi của một trụ → sửa ở bảng STEMS/BRANCHES (already scanned ở mục 2),
+// không phải thêm 60 dòng trụ vào terms.override.ts.
+const checkPillar = (zh: string | undefined, where: string) => {
+  if (!zh) return;
+  if (viPillar(zh).missing) missing.add(`${zh}  (${where}) — một nửa can/chi chưa có bản Việt`);
+};
 
-// 1. Ten trong bang tinh ye cua repo (85 ID sao trong school-data.ts)
+// 1. Ten trong bang tinh ye cua repo (61 ID sao trong school-data.ts)
 for (const id of Object.keys(SCHOOL_STAR_ID_TO_NAME)) {
   check(SCHOOL_STAR_ID_TO_NAME[Number(id)], `school-data id ${id}`);
 }
@@ -44,21 +76,23 @@ const seen = new Set<string>();
 for (const [y, m, d, h] of SAMPLES) {
   for (const g of ['male', 'female'] as const) {
     const chart = generateChart({ year: y, month: m, day: d, hour: h, gender: g });
-    check(chart.wuxingJuName, `${y}-${m}-${d} wuxingJuName`);
-    check(chart.mingZhu, `${y}-${m}-${d} mingZhu`);
-    check(chart.shenZhu, `${y}-${m}-${d} shenZhu`);
-    for (const p of chart.palaces) {
-      check(p.name, `${y}-${m}-${d} palace.name`);
-      check(p.borrowedFromName, `${y}-${m}-${d} borrowedFromName`);
-      for (const s of p.stars) {
-        check(s.name, `${y}-${m}-${d} star.name`);
-        if (s.brightnessRaw) check(s.brightnessRaw, `${y}-${m}-${d} brightnessRaw`);
-        if (s.siHua) check(s.siHua, `${y}-${m}-${d} siHua`);
-        seen.add(s.name);
-      }
-    }
-    for (const dx of chart.daXians) check(dx.palaceName, `${y}-${m}-${d} daXian.palaceName`);
+    const where = `${y}-${m}-${d} ${g}`;
+    // collectChartNames: trường vô danh — nhãn nào thiếu thì dòng missing tự nói tên nó.
+    for (const n of collectChartNames(chart)) check(n, `${where} chart field`);
+    for (const p of chart.lunarInfo.fourPillars ?? []) checkPillar(p, `${where} fourPillars`);
+    for (const p of chart.lunarInfo.fourPillarsLunar ?? []) checkPillar(p, `${where} fourPillarsLunar`);
+    // seen giữ đúng nghĩa "tên SAO" cho con số in ra cuối test.
+    for (const p of chart.palaces) for (const s of p.stars) seen.add(s.name);
   }
+}
+
+// San_floor: nếu algorithm đổi shape (palaces rỗng, stars mất tên…) thì quét bên trên chạy
+// trên không-thống — coverage "pass" mà không phủ gì cả. 48 lá số thật đo được 70 tên sao
+// phân biệt; thấp hơn sàn nghĩa là shape regression, không phải may.
+if (seen.size < 70) {
+  console.error(`✗ Shape regression: chỉ gom được ${seen.size} tên sao từ 48 lá số (san 70) — ` +
+                `coverage quét khoảng trống, không được tính là đạt.`);
+  process.exit(1);
 }
 
 if (missing.size) {
@@ -68,4 +102,4 @@ if (missing.size) {
   console.error(`→ đã kiểm chứng được ${seen.size} tên sao khác nhau từ 48 lá số.`);
   process.exit(1);
 }
-console.log(`✅ chart-name-coverage: ${seen.size} tên sao thực tế + toàn bộ bảng constants/school-data đều có bản Việt.`);
+console.log(`✅ chart-name-coverage: ${seen.size} tên sao thực tế + fourPillars (ghép can/chi qua viPillar) + toàn bộ bảng constants/school-data đều có bản Việt.`);

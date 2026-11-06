@@ -1,6 +1,7 @@
-import { viTerm, biTerm, hasTerm } from '../../lib/i18n/resolve';
+import { viTerm, biTerm, hasTerm, viPillar } from '../../lib/i18n/resolve';
 import { GENERATED_TERMS } from '../../lib/i18n/terms.generated';
-import { OVERRIDE_TERMS } from '../../lib/i18n/terms.override';
+import { OVERRIDE_TERMS, pickOverride } from '../../lib/i18n/terms.override';
+import type { OverrideEntry } from '../../lib/i18n/terms.types';
 
 let failed = 0;
 const ok = (c: boolean, m: string) => { if (!c) { failed++; console.error('  ✗ ' + m); } else console.log('  ✓ ' + m); };
@@ -37,13 +38,29 @@ ok(hasTerm('不存在的东西') === false, 'hasTerm false khi chua co');
 ok(viTerm('紫微', 'star') === 'Tử Vi', 'kind=star vẫn ra Tử Vi');
 ok(viTerm('紫微') === viTerm('紫微', 'misc'), 'kind lạ không làm hỏng kết quả');
 
-// 6. R13: HAI mục override CÙNG zh, khác kind (fixture '双轨' trong terms.override.ts).
-//    Không có case này thì nhánh find (resolve.ts:15) và nhánh push (terms.override.ts:64)
-//    là code chết — không ai chứng minh exact kind THẮNG thứ tự khai báo.
-ok(viTerm('双轨', 'star') === 'Song Quỹ (sao)', "kind='star' khop muc 1 (cung zh khac kind)");
-ok(viTerm('双轨', 'pattern') === 'Song Quỹ (cách)', "kind='pattern' khop muc 2 — kind thắng muc dau khai bao");
-ok(viTerm('双轨') === 'Song Quỹ (sao)', 'khong kind -> lay muc dau khai bao');
-ok(viTerm('双轨', 'brightness') === 'Song Quỹ (sao)', 'kind sai -> roi ve muc dau khai bao, khong mat ban dich');
+// 6. R13: exact kind THẮNG thứ tự khai báo, kind sai rơi về mục đầu — chứng minh bằng
+//    fixture cục bộ qua helper pure pickOverride (terms.override.ts). Trước đây case này
+//    sống bằng 2 mục '双轨' giả trong bảng production: chúng đi theo allTermsZh() sang
+//    Task 10 in cho người dùng rà — fixture không được ship lẫn dữ liệu thật.
+const R13_FIXTURE: OverrideEntry[] = [
+  { zh: '双轨', vi: 'Song Quỹ (sao)', kind: 'star', note: 'fixture cục bộ — mục đầu khai báo.' },
+  { zh: '双轨', vi: 'Song Quỹ (cách)', kind: 'pattern', note: 'fixture cục bộ — mục hai cùng zh.' },
+];
+ok(pickOverride(R13_FIXTURE, 'star')?.vi === 'Song Quỹ (sao)', "pickOverride kind='star' khớp mục 1");
+ok(pickOverride(R13_FIXTURE, 'pattern')?.vi === 'Song Quỹ (cách)', "pickOverride kind='pattern' thắng muc dau khai bao");
+ok(pickOverride(R13_FIXTURE)?.vi === 'Song Quỹ (sao)', 'pickOverride khong kind -> lay muc dau khai bao');
+ok(pickOverride(R13_FIXTURE, 'brightness')?.vi === 'Song Quỹ (sao)', 'pickOverride kind sai -> roi ve muc dau, khong mat ban dich');
+ok(pickOverride([], 'star') === undefined, 'pickOverride danh sach rong -> undefined');
+// Fixture phải ở ngoài bảng production — nếu ai thêm lại '双轨' vào terms.override.ts, fail ở đây.
+ok(!OVERRIDE_TERMS.some((e) => e.zh === '双轨'), "bang production khong con fixture '双轨' (allTermsZh sach)");
+
+// 6b. viPillar — 60 tổ hợp can chi không phải từ bảng: ghép từ bản dịch can+chi sẵn có.
+ok(viPillar('庚午').missing === false && viPillar('庚午').vi === 'Canh Ngọ', "viPillar('庚午') -> 'Canh Ngọ'");
+ok(viPillar('辛亥').missing === false && viPillar('辛亥').vi === 'Tân Hợi', "viPillar('辛亥') -> 'Tân Hợi'");
+const halfUnknown = viPillar('庚鼖'); // '鼖' không phải chi nào
+ok(halfUnknown.missing === true && halfUnknown.vi === '庚鼖', 'mot nura unknown -> missing=true, vi===zh (khong hoi noi Viet)');
+ok(viPillar('壬子').missing === false && viPillar('壬子').vi === 'Nhâm Tý', "viPillar('壬子') -> 'Nhâm Tý'");
+ok(viPillar('干').missing === true, 'khong phai 2 chu -> missing (can don khong phai tru)');
 
 // 7. R13 guard: mọi OverrideEntry phải có vi và note khác rỗng.
 //    vi rỗng là đường hỏng IM LẶNG: resolve.ts:17 `if (vi) return vi;` bỏ qua override rồi

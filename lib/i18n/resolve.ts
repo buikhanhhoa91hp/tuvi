@@ -1,5 +1,5 @@
 import { GENERATED_TERMS } from './terms.generated';
-import { OVERRIDE_BY_ZH } from './terms.override';
+import { OVERRIDE_BY_ZH, pickOverride } from './terms.override';
 import { UI_FMT_VI, UI_VI } from './ui-phrases';
 import type { BiPair, TermKind } from './terms.types';
 
@@ -10,12 +10,8 @@ import type { BiPair, TermKind } from './terms.types';
  */
 export function viTerm(zh: string, kind?: TermKind): string | undefined {
   if (!zh) return undefined;
-  const overrides = OVERRIDE_BY_ZH.get(zh);
-  if (overrides) {
-    const exact = kind ? overrides.find((o) => o.kind === kind) : undefined;
-    const vi = (exact ?? overrides[0]).vi;
-    if (vi) return vi;
-  }
+  const chosen = pickOverride(OVERRIDE_BY_ZH.get(zh) ?? [], kind);
+  if (chosen && chosen.vi) return chosen.vi;
   const gen = GENERATED_TERMS[zh];
   if (gen) return gen;
   // Cắt hậu tố 宫/星 rồi thử lại: '兄弟宫' → '兄弟', '火星' vẫn ra 'Hỏa Tinh'
@@ -34,6 +30,24 @@ export function biTerm(zh: string, kind?: TermKind): BiPair {
 
 export function hasTerm(zh: string): boolean {
   return viTerm(zh) !== undefined;
+}
+
+/**
+ * CANH CHỈ hai chữ (庚午, 辛亥… — algorithm.ts:224-258 sinh fourPillars/fourPillarsLunar
+ * bằng `${STEMS[i]}${BRANCHES[j]}`, 60 tổ hợp). Không bịa 60 dòng bảng: tra trực tiếp trước
+ * (override vẫn thắng nếu ai đó khai một cột), không có thì TÁCH can + chi và ghép bản dịch
+ * sẵn có — '庚午' → 'Canh Ngọ'. Một nửa không tra được → missing:true, vi === zh (UI không
+ * hiện nửa Việt nửa Hán). Pure, không state.
+ */
+export function viPillar(zh: string): BiPair {
+  const direct = viTerm(zh);
+  if (direct) return { zh, vi: direct, missing: false };
+  if (zh.length === 2) {
+    const stem = viTerm(zh.slice(0, 1));
+    const branch = viTerm(zh.slice(1));
+    if (stem && branch) return { zh, vi: `${stem} ${branch}`, missing: false };
+  }
+  return { zh, vi: zh, missing: true };
 }
 
 /** Mọi khóa Hán đã có bản dịch — dùng cho coverage test và báo cáo thuật ngữ. */
