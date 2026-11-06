@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import type { ZiweiChart } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
 import { detectPatterns, getMingGongSummary } from '@/lib/ziwei/patterns';
+import Bi from './Bi';
+import { biTerm } from '@/lib/i18n/resolve';
 
 interface ChartSummaryProps {
   chart: ZiweiChart;
@@ -28,7 +30,10 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
       }
     }
   }
-  const siHuaOrder = ['禄', '权', '科', '忌'];
+  // Thứ tự sort so với GIÁ TRỊ engine (star.siHua là ký tự Hán) — qua biTerm(..).zh đồng
+  // nhất như SIHUA_STYLES của PalaceCell.tsx: ký tự so khớp không đổi, literal không còn trần.
+  const siHuaOrder = [biTerm('禄', 'mutagen').zh, biTerm('权', 'mutagen').zh,
+    biTerm('科', 'mutagen').zh, biTerm('忌', 'mutagen').zh];
   siHuaSummary.sort((a, b) => siHuaOrder.indexOf(a.siHua) - siHuaOrder.indexOf(b.siHua));
 
   return (
@@ -47,19 +52,25 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
       <div className="card-glass rounded-xl p-5">
         <div className="text-[10px] tracking-widest mb-4 flex items-center gap-2" style={{ color: 'var(--t-faint)' }}>
           <span style={{ color: 'var(--t-gold)', opacity: 0.6 }}>✦</span>
-          命格总览
+          <Bi mode="text" zh="命格总览" />
         </div>
 
         <div className="flex flex-wrap items-start gap-4">
           <div>
-            <div className="text-[9px] mb-1.5" style={{ color: 'var(--t-faint)', opacity: 0.85 }}>命宫主星</div>
+            <div className="text-[9px] mb-1.5" style={{ color: 'var(--t-faint)', opacity: 0.85 }}>
+              <Bi mode="text" zh="命宫主星" />
+            </div>
             <div className="flex items-center gap-1">
               {mingStars.length > 0 ? (
                 mingStars.map(s => (
-                  <span key={s} className="font-bold text-lg" style={{ color: 'var(--t-gold)' }}>{s}</span>
+                  <span key={s} className="font-bold text-lg" style={{ color: 'var(--t-gold)' }}>
+                    <Bi mode="term" zh={s} kind="star" compact />
+                  </span>
                 ))
               ) : (
-                <span className="text-sm" style={{ color: 'var(--t-faint)' }}>空宫</span>
+                <span className="text-sm" style={{ color: 'var(--t-faint)' }}>
+                  <Bi mode="text" zh="空宫" compact />
+                </span>
               )}
             </div>
             {nature && (
@@ -69,7 +80,9 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
 
           {keywords.length > 0 && (
             <div>
-              <div className="text-[9px] mb-1.5" style={{ color: 'var(--t-faint)', opacity: 0.85 }}>性格特质</div>
+              <div className="text-[9px] mb-1.5" style={{ color: 'var(--t-faint)', opacity: 0.85 }}>
+                <Bi mode="text" zh="性格特质" />
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {keywords.map(k => (
                   <span key={k} className="text-[10px] px-2 py-0.5 rounded-full"
@@ -86,7 +99,9 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
           )}
 
           <div className="ml-auto text-right">
-            <div className="text-[9px] mb-1" style={{ color: 'var(--t-faint)', opacity: 0.85 }}>五行局 · 当前大限</div>
+            <div className="text-[9px] mb-1" style={{ color: 'var(--t-faint)', opacity: 0.85 }}>
+              <Bi mode="text" zh="五行局 · 当前大限" />
+            </div>
             <div className="text-[11px]" style={{ color: 'var(--t-text2)' }}>{chart.wuxingJuName}</div>
             {currentDx && (
               <div className="text-[11px] text-purple-500 mt-0.5">
@@ -100,7 +115,7 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
           style={{ borderTop: '1px solid var(--t-border)', color: 'var(--t-faint)' }}>
           <span>公历 {chart.birthInfo.year}-{chart.birthInfo.month}-{chart.birthInfo.day}</span>
           <span>
-            农历 {chart.lunarInfo.lunarYear}年{chart.lunarInfo.isLeapMonth ? '闰' : ''}
+            农历 {chart.lunarInfo.lunarYear}年{chart.lunarInfo.isLeapMonth ? <Bi mode="text" zh="闰" compact /> : ''}
             {chart.lunarInfo.lunarMonth}月{chart.lunarInfo.lunarDay}日
           </span>
           <span>{STEMS[chart.lunarInfo.yearStem]}{BRANCHES[chart.lunarInfo.yearBranch]}年 · {BRANCHES[chart.birthInfo.hour]}时</span>
@@ -119,26 +134,35 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
         <div className="card-glass rounded-xl p-4">
           <div className="text-[10px] tracking-widest mb-3 flex items-center gap-2" style={{ color: 'var(--t-faint)' }}>
             <span style={{ color: 'var(--t-gold)', opacity: 0.6 }}>◆</span>
-            本命四化
+            <Bi mode="text" zh="本命四化" />
           </div>
           <div className="grid grid-cols-2 gap-2">
             {siHuaSummary.map(({ name, siHua, palaceName }) => {
+              // Key màu là ký tự Hán engine (siHua từ star.siHua) — cùng khuôn
+              // SIHUA_STYLES của PalaceCell.tsx: biTerm(..).zh đồng nhất, không đổi so khớp.
               const colors: Record<string, { text: string; bg: string; border: string }> = {
-                '禄': { text: '#4ade80', bg: 'rgba(74,222,128,0.06)', border: 'rgba(74,222,128,0.2)' },
-                '权': { text: '#60a5fa', bg: 'rgba(96,165,250,0.06)', border: 'rgba(96,165,250,0.2)' },
-                '科': { text: '#facc15', bg: 'rgba(250,204,21,0.06)', border: 'rgba(250,204,21,0.2)' },
-                '忌': { text: '#f87171', bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.2)' },
+                [biTerm('禄', 'mutagen').zh]: { text: '#4ade80', bg: 'rgba(74,222,128,0.06)', border: 'rgba(74,222,128,0.2)' },
+                [biTerm('权', 'mutagen').zh]: { text: '#60a5fa', bg: 'rgba(96,165,250,0.06)', border: 'rgba(96,165,250,0.2)' },
+                [biTerm('科', 'mutagen').zh]: { text: '#facc15', bg: 'rgba(250,204,21,0.06)', border: 'rgba(250,204,21,0.2)' },
+                [biTerm('忌', 'mutagen').zh]: { text: '#f87171', bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.2)' },
               };
-              const c = colors[siHua] || colors['禄'];
+              const c = colors[siHua] || colors[biTerm('禄', 'mutagen').zh];
               return (
                 <div key={name + siHua}
                   className="flex items-center justify-between px-3 py-2 rounded-lg text-[10px]"
                   style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.text }}
                 >
-                  <span className="font-medium">{name}</span>
+                  <span className="font-medium"><Bi mode="term" zh={name} kind="star" compact /></span>
                   <div className="flex items-center gap-1.5 text-right">
-                    <span style={{ opacity: 0.6 }} className="text-[9px]">{palaceName.replace('宫', '')}</span>
-                    <span className="font-bold">化{siHua}</span>
+                    {/* '财帛' — cung tên cắt hậu tố 宫 để gọn badge; 宫 trong replace() đi qua
+                        biTerm(..).zh (đồng nhất — khuôn PalaceCell.tsx:40-45) để literal không
+                        còn trần; bản in hai ngôn ngữ do <Bi mode="term"> quyết. */}
+                    <span style={{ opacity: 0.6 }} className="text-[9px]">
+                      <Bi mode="term" zh={palaceName.replace(biTerm('宫', 'palace').zh, '')} kind="palace" compact />
+                    </span>
+                    {/* '化禄' hai âm: terms.override.ts đã có 化禄/化权/化科/化忌 — ghép lúc
+                        chạy nên tra thẳng bằng <Bi mode="term">, không để '化' + ký tự Hán thô. */}
+                    <span className="font-bold"><Bi mode="term" zh={biTerm('化', 'mutagen').zh + siHua} kind="mutagen" compact /></span>
                   </div>
                 </div>
               );
@@ -158,7 +182,7 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
         <div className="card-glass rounded-xl p-4">
           <div className="text-[10px] tracking-widest mb-3 flex items-center gap-2" style={{ color: 'var(--t-faint)' }}>
             <span style={{ color: 'var(--t-gold)', opacity: 0.6 }}>◉</span>
-            格局识别
+            <Bi mode="text" zh="格局识别" />
             <span className="text-[9px] ml-auto" style={{ color: 'var(--t-faint)', opacity: 0.75 }}>{patterns.length}个格局</span>
           </div>
           <div className="space-y-2">
@@ -178,7 +202,7 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
                     <div className="flex gap-1 ml-auto">
                       {p.palaces.slice(0, 2).map(pa => (
                         <span key={pa} className={`text-[8px] px-1.5 py-px rounded-full border ${st.badge}`}>
-                          {pa.replace('宫', '')}
+                          <Bi mode="term" zh={pa.replace(biTerm('宫', 'palace').zh, '')} kind="palace" compact />
                         </span>
                       ))}
                     </div>
@@ -191,21 +215,21 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
                     <div className="mt-2 pl-3.5 space-y-0.5">
                       {p.conditions.required.length > 0 && (
                         <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                          <span className="font-medium" style={{ color: 'var(--t-gold)' }}>必须</span>
+                          <span className="font-medium" style={{ color: 'var(--t-gold)' }}><Bi mode="text" zh="必须" /></span>
                           <span style={{ opacity: 0.6 }}> · </span>
                           {p.conditions.required.join('、')}
                         </div>
                       )}
                       {p.conditions.bonus && p.conditions.bonus.length > 0 && (
                         <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                          <span className="font-medium text-emerald-500">加分</span>
+                          <span className="font-medium text-emerald-500"><Bi mode="text" zh="加分" /></span>
                           <span style={{ opacity: 0.6 }}> · </span>
                           {p.conditions.bonus.join('、')}
                         </div>
                       )}
                       {p.conditions.breaking && p.conditions.breaking.length > 0 && (
                         <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                          <span className="font-medium text-orange-500">破格</span>
+                          <span className="font-medium text-orange-500"><Bi mode="text" zh="破格" /></span>
                           <span style={{ opacity: 0.6 }}> · </span>
                           {p.conditions.breaking.join('、')}
                         </div>
@@ -235,7 +259,7 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
       <div className="card-glass rounded-xl p-4">
         <div className="text-[10px] tracking-widest mb-3 flex items-center gap-2" style={{ color: 'var(--t-faint)' }}>
           <span className="text-purple-500/60">◎</span>
-          大限运程
+          <Bi mode="text" zh="大限运程" />
         </div>
         <div className="grid grid-cols-3 gap-2">
           {chart.daXians.slice(0, 9).map((dx, i) => {
@@ -253,7 +277,9 @@ export default function ChartSummary({ chart }: ChartSummaryProps) {
                 }}
               >
                 <div className="font-mono tabular-nums">{dx.startAge}~{dx.endAge}</div>
-                <div className="text-[9px] mt-0.5" style={{ opacity: 0.7 }}>{dx.palaceName.replace('宫', '')}</div>
+                <div className="text-[9px] mt-0.5" style={{ opacity: 0.7 }}>
+                  <Bi mode="term" zh={dx.palaceName.replace(biTerm('宫', 'palace').zh, '')} kind="palace" compact />
+                </div>
               </div>
             );
           })}

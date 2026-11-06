@@ -73,6 +73,47 @@ export const UI_VI: Record<string, string> = {
   '（本页为引擎 Demo，完整商业版界面不在开源范围；排盘内核完全开放。）':
     '(Trang này là bản demo engine; giao diện thương mại đầy đủ không nằm trong bản open-source, còn nhân thuật toán thì mở hoàn toàn.)', // :34
   '← 重新起盘': '← Lập lại',                                        // :52
+
+  // ── components/TimeNav.tsx (fix wave — vòng review toàn nhánh cuối) ──
+  '本命': 'Bản mệnh',                                               // :88 tab
+  '大限': 'Đại hạn',                                                // :96 (nhánh fallback của tab) + :154 (args {z} của fmt 年四化)
+  '流年': 'Lưu niên',                                               // :116 tab
+  // hasTerm('本命')/hasTerm('大限')/hasTerm('流年') đều false (đo bằng probe
+  // resolve.ts trước khi thêm) — không vi phạm R12; '限'/'年' một âm vẫn là thuật ngữ ở
+  // terms.override.ts, còn ba nhãn tab hai âm này là CÂU điều hướng.
+
+  // ── components/ChartSummary.tsx (fix wave) ──
+  '命格总览': 'Tổng quan mệnh cách',                                 // :50
+  '命宫主星': 'Chính tinh cung Mệnh',                                // :55
+  '性格特质': 'Đặc tính tính cách',                                  // :72
+  '五行局 · 当前大限': 'Cục ngũ hành · Đại hạn hiện tại',             // :89 (· là U+00B7, có dấu cách hai bên — copy nguyên văn)
+  '本命四化': 'Tứ hóa bản mệnh',                                     // :122
+  '格局识别': 'Nhận diện cách cục',                                  // :161
+  '必须': 'Bắt buộc',                                                // :194 điều kiện cách cục
+  '加分': 'Điểm cộng',                                               // :201
+  '破格': 'Phá cách',                                                // :208
+  '大限运程': 'Vận trình đại hạn',                                   // :238
+
+  // ── components/StarDetailPanel.tsx (fix wave) ──
+  '主星': 'Chính tinh',                                              // :166 nhãn loại sao
+  '吉星': 'Cát tinh',                                                // :167
+  '煞星': 'Sát tinh',                                                // :168
+  '杂星': 'Tạp tinh',                                                // :169
+  '五行': 'Ngũ hành',                                                // :216 chip thuộc tính
+  '性质': 'Tính chất',                                               // :217
+  '位置': 'Vị trí',                                                  // :218
+  '庙旺': 'Miếu vượng',                                              // :219 nhãn độ sáng (đối chiếu brightness tiếng Anh, không so với dữ liệu Hán)
+  '落陷': 'Lạc hãm',                                                 // :220
+  '平和': 'Bình hòa',                                                // :220
+  '星曜特质': 'Đặc tính tinh diệu',                                  // :236
+  '古书原文': 'Nguyên văn cổ thư',                                   // :252 — văn cổ giữ nguyên Hán, chỉ Việt nhãn
+  '倪海厦老师解读': 'Thầy Ni Hải Hạ luận giải',                       // :264
+  '事业方向': 'Phương hướng sự nghiệp',                               // :272
+  '感情特质': 'Đặc tính tình cảm',                                    // :273
+  '财运分析': 'Phân tích tài vận',                                    // :274
+  '健康提示': 'Lưu ý sức khỏe',                                       // :275
+  '最佳宫位': 'Cung tốt nhất',                                       // :289
+  '注意宫位': 'Cung cần lưu ý',                                       // :293
 };
 
 /**
@@ -105,4 +146,10 @@ export const UI_FMT_VI: Record<string, string> = {
   // <Bi mode="fmt" template="{n1}–{n2}岁" …/> : chuỗi trần khai báo trong lời dịch → thấy được,
   // và vì thế KHÔNG cần dòng nào trong TEMPLATE_OK của ratchet (R7 đường (a)).
   '{n1}–{n2}岁': '{n1}–{n2} tuổi',                     // ChartBoard.tsx:212 (dấu – là U+2013, giống source)
+
+  // Fix wave — TimeNav.tsx. Key '{z}·{s}年四化：' dùng hai placeholder RIÊNG cho hai vế
+  // (zh điền {z}/{s} nguyên văn Hán; vi điền {v}/{sv} bản Việt) vì vế Việt đảo trật tự —
+  // R14 khớp key tuyệt đối nên call site phải truyền đúng chuỗi này.
+  '大限 {n1}–{n2}': 'Đại hạn {n1}–{n2}',                // TimeNav.tsx:96 tab đại hạn (– là U+2013)
+  '{z}·{s}年四化：': 'Tứ hóa {v} · can {sv}:',          // TimeNav.tsx:154 (· là U+00B7, ： là U+FF1A — copy nguyên văn)
 };

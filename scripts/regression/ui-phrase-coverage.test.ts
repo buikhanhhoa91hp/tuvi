@@ -32,6 +32,10 @@ export const ADOPTED: string[] = [
   'components/PalaceCell.tsx',
   'components/ChartBoard.tsx',
   'components/BirthForm.tsx',
+  // Fix wave (final whole-branch review): ba file cua man hinh /chart con lai.
+  'components/TimeNav.tsx',
+  'components/ChartSummary.tsx',
+  'components/StarDetailPanel.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
