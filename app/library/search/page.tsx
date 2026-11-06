@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { searchClassics, getParagraphById } from '@/lib/classics';
 import { biText } from '@/lib/i18n/resolve';
 
-// Metadata SEO giu nguyen tieng Trung (phan quyet commit e0e2140) — mien qua EXCLUDE.
+// Task c5: metadata <head> da dich sang tieng Viet (R30, biText(...).vi) — dao nguoc phan
+// quyet e0e2140. Literal nam TRONG loi dich nen van qua R28.
 export const metadata = {
-  title: '搜索 · 古籍原典库',
+  title: biText('搜索 · 古籍原典库').vi,
 };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {

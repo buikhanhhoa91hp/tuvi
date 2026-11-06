@@ -8,14 +8,16 @@ import { ALL_STARS, ALL_TOPICS, getKnowledge, STAR_BRIEF_SEO, STAR_TO_SLUG } fro
 import { TOPIC_LABEL } from '@/lib/ziwei/db-analysis';
 import { biFmt, biTerm, biText } from '@/lib/i18n/resolve';
 
-// Metadata SEO giu nguyen tieng Trung (phan quyet commit e0e2140: chi dao html lang
-// sang vi, khong doi title/description/keywords). Cac literal o day do ratchet
-// mien tuong minh qua EXCLUDE (scripts/regression/ui-phrase-coverage.test.ts).
+// Task c5: metadata <head> cua /knowledge DA DICH sang tieng Viet qua biText(...).vi (R30) —
+// dao nguoc phan quyet e0e2140 (tru day giu nguyen van Han). Cac literal nay van qua R28 vi
+// chung nam TRONG loi dich; dong EXCLUDE tuong ung trong ratchet tro thanh vo hieu voi file
+// nay (no van can cho JSON-LD + tu khoa DATA o app/knowledge/[star]/[topic]/page.tsx).
+// keywords viet bang tieng Viet thuan: R12 khuyen khong them tu don le vao UI_VI.
 
 export const metadata = {
-  title: '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系',
-  description: '基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。',
-  keywords: ['紫微斗数', '倪海厦', '倪海厦紫微斗数', '紫微斗数全集', '紫微斗数全书', '14 主星', '12 宫位'],
+  title: biText('紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系').vi,
+  description: biText('基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。').vi,
+  keywords: ['Tử Vi đẩu số', 'Ni Hải Hạ', 'Kho tri thức Tử Vi đẩu số', 'Tử Vi Đẩu Số Toàn Tập', 'Tử Vi Đẩu Số Toàn Thư', 'Cốt Tủy Phú', '14 chính tinh', '13 cung'],
 };
 
 export default function KnowledgeHomePage() {

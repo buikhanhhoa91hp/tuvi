@@ -13,16 +13,16 @@ export async function generateStaticParams() {
   );
 }
 
-// Metadata SEO giu nguyen tieng Trung (phan quyet commit e0e2140): hai template duoi
-// day noi title/description bang ten co thu + ten chi (DATA tu lib/classics/data/*)
-// → khai bao tuong minh trong TEMPLATE_OK cua ratchet, khong dich.
+// Task c5 (dot C): phan CHROME cua metadata da dich sang tieng Viet. Ten co thu + ten chi
+// trong template la DATA tu lib/classics/data/* → khong dich o dot nay; hai dong template
+// cua file nay vi the khong con can khai bao TEMPLATE_OK nua.
 export async function generateMetadata({ params }: { params: Promise<{ book: string; chapter: string }> }) {
   const { book: bookSlug, chapter: chIdx } = await params;
   const result = getChapter(bookSlug, parseInt(chIdx));
   if (!result) return {};
   return {
-    title: `${result.chapter.title} · 《${result.book.title}》· 紫微斗数古籍`,
-    description: result.chapter.subtitle || `《${result.book.title}》${result.chapter.title}原文`,
+    title: `${result.chapter.title} · 《${result.book.title}》· Cổ thư Tử Vi đẩu số`,
+    description: result.chapter.subtitle || `《${result.book.title}》${result.chapter.title} — nguyên văn`,
   };
 }
 

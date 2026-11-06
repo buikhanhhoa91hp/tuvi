@@ -54,6 +54,10 @@ export const ADOPTED: string[] = [
   // biText(...).vi (R30). Van ban ket qua tu SSE /api/heming va noi dung co tich/
   // du lieu thuat ngu khong thuoc page nay -> khong doi.
   'app/heming/page.tsx',
+  // Task c5: hai trang phap ly /privacy va /terms. Toan bo prose la chrome cua page
+  // -> dich het qua biText(...).vi (R30), khong dung <Bi mode="text"> (se in them dong Hán).
+  'app/privacy/page.tsx',
+  'app/terms/page.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
@@ -112,26 +116,22 @@ const EXCLUDE = new Set<string>([
   '紫微斗数全书',    // ly do: ten co thu + tu khoa SEO, giu nguyen van
   '14 主星',         // ly do: tu khoa SEO (metadata keywords), giu nguyen van
   '12 宫位',         // ly do: tu khoa SEO (metadata keywords), giu nguyen van
-  // ly do 3 dong duoi: metadata title/description cua /knowledge + JSON-LD Article
-  // (SEO structured data) — giu nguyen van theo phan quyet e0e2140.
-  '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系',
-  '基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。',
+  // ly do 2 dong duoi: JSON-LD Article (SEO structured data) cua /knowledge/[star]/[topic] —
+  // giu nguyen van. (Task c5 da dich title/description metadata sang tieng Viet va XOA 2
+  // dong EXCLUDE tuong ung: chung gioi nam TRONG biText nen van qua R28.)
   '紫微研究 · 倪海厦正宗', // ly do: JSON-LD author.name, giu nguyen van
   '紫微研究',        // ly do: JSON-LD publisher.name, giu nguyen van
   '紫微斗数 · 倪海厦体系', // ly do: JSON-LD articleSection, giu nguyen van
 
-  // R30-dot-Task-c3 — /library (thu vien co thu). HAI NHOM mien, deu co chu dich that
-  // o UI_VI cho cac chuoi khac; day chi la phan GIU NGUYEN VAN co y thuc:
-  // (1) metadata SEO cua 3 page — phan quyet e0e2140 (title/description khong doi khi
-  //     doi ngon ngu hien thi; chung la tu khoa tim kiem nguoi dung goi bang tieng Trung);
-  // (2) duong dan vi du tu khoa tren trang ket qua — day la CHUOI GOI cho searchClassics
-  //     (matching tren ngu lieu co tich viet bang chu Hán), dich sang tieng Viet thi
-  //     nguoi dung nhan noi dung goi ma khong tim thay gi → khong phai nhan UI dich duoc.
+  // R30-dot-Task-c3 — /library (thu vien co thu). Task c5 da dich chrome cua page nay +
+  // metadata title/description cua 3 page (/library, /library/search) sang tieng Viet,
+  // nen 3 dong EXCLUDE metadata o day KHONG CON (chuoi khong con nam tran trong source;
+  // chung gioi duoc boc biText nen qua R28 that, khong can mien tru). Con lai 1 nhom:
+  // duong dan vi du tu khoa tren trang ket qua — day la CHUOI GOI cho searchClassics
+  // (matching tren ngu lieu co tich viet bang chu Hán), dich sang tieng Viet thi
+  // nguoi dung nhan noi dung goi ma khong tim thay gi → khong phai nhan UI dich duoc.
   // LUU Y nhu 12 dia chi o tren: EXCLUDE khop toan cuc theo nguyen van, nen mot file
   // ADOPTED tuong lai in tran cung chuoi do cung lot luoi — bat case do bang render test.
-  '倪师方法论 · 古籍原典库 · 紫微斗数全集 / 全书 / 骨髓赋', // ly do: metadata title /library, giu nguyen van
-  '紫微斗数权威古籍全文检索：《紫微斗数全集》《紫微斗数全书》《骨髓赋》倪海厦《天纪》引证来源', // ly do: metadata description /library
-  '搜索 · 古籍原典库', // ly do: metadata title /library/search
   '七杀朝斗 / 双禄朝垣 / 化忌 / 紫微 / 命宫 / 机月同梁', // ly do: chuoi goi thu cho may tim kiem ngu lieu Hán (search/page.tsx empty state)
 ]);
 
@@ -162,22 +162,18 @@ const EXCLUDE = new Set<string>([
  */
 const TEMPLATE_OK = new Set<string>([
   // Rat: Task 7 ve duong (a) (Bi mode="fmt" + key UI_FMT_VI) nen khong dong nao o day.
-  // Task c2 — template literal TRONG metadata/JSON-LD cua /knowledge/[star]/[topic]:
-  // SEO giu nguyen van (phan quyet e0e2140), khai bao tuong minh tung nguyen van source
-  // theo dung co che R7 duong (b). KHONG phai van ban UI: generateMetadata + Article LD.
-  '${star}入${data.palaceName}宫 · ${data.topicLabel} · 倪海厦体系详解', // :46 metadata title
-  '${star}入${data.palaceName}宫的紫微斗数解读 — 基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》。', // :48 metadata description
-  '${star}入${data.palaceName}',           // :64 metadata keywords
+  // Task c2 — template literal TRONG metadata/JSON-LD cua /knowledge/[star]/[topic].
+  // Task c5 (dot C): title + description cua generateMetadata DA DICH sang tieng Viet qua
+  // biFmt (key UI_FMT_VI) nen HAI dong template tuong ung da bi XOA khoi day — con lai la
+  // tu khoa SEO + JSON-LD van mang ten Hán (DATA), khai bao tuong minh tung nguyen van.
+  '${star}入${data.palaceName}',           // :64 metadata keywords (ten sao/cung = DATA)
   '紫微斗数 ${star}',                       // :65 metadata keywords
-  '${star}入${data.palaceName}宫 · ${data.topicLabel}', // :86 JSON-LD headline
+  '${star}入${data.palaceName}宫 · ${data.topicLabel}', // JSON-LD headline (cau truc du lieu)
 
-  // Task c3 — /library: template literal trong generateMetadata (SEO giu nguyen van,
-  // phan quyet e0e2140). Phan ${...} la ten sach/ten chi/trieu dai — DATA tu
-  // lib/classics/data/*, khong phai chrome; khai bao tuong minh tung nguyen van source
-  // theo co che R7 duong (b).
-  '《${book.title}》· ${book.dynasty} · 紫微斗数古籍原典库', // app/library/[book]/page.tsx metadata title
-  '${result.chapter.title} · 《${result.book.title}》· 紫微斗数古籍', // app/library/[book]/[chapter]/page.tsx metadata title
-  '《${result.book.title}》${result.chapter.title}原文', // :21 metadata description (van ban co tich, khong dich)
+  // Task c3 — /library: generateMetadata. Task c5 da dich chrome (`· 紫微斗数古籍原典库`,
+  // `· 紫微斗数古籍`, `原文`) sang tieng Viet truc tiep trong template (phan ${...} la ten
+  // sach/ten chi/trieu dai = DATA tu lib/classics/data/*, khong duoc cham), nen ba dong
+  // TEMPLATE_OK cua /library KHONG CON can thiet — da xoa.
 ]);
 
 /**

@@ -9,12 +9,13 @@ import { ALL_BOOKS, TOTAL_PARAGRAPHS } from '@/lib/classics';
 import { biFmt, biText } from '@/lib/i18n/resolve';
 import LibrarySearch from './LibrarySearch';
 
-// Metadata SEO giu nguyen tieng Trung (phan quyet commit e0e2140: chi doi html lang
-// sang vi, khong doi title/description). Hai literal o day duoc ratchet mien tuong
-// minh qua EXCLUDE (scripts/regression/ui-phrase-coverage.test.ts).
+// Task c5: metadata <head> cua /library DA DICH sang tieng Viet qua biText(...).vi (R30) —
+// dao nguoc phan quyet e0e2140. Hai literal van nam TRONG loi dich nen qua R28; ten co thu o
+// phan title/description dung ten Viet dia (Tử Vi Đẩu Số Toàn Tập / Toàn Thư / Cốt Tủy Phú)
+// vi day la chuoi <head> nguoi dung doc, khong phai khoa goi may tim kiem du lieu.
 export const metadata = {
-  title: '倪师方法论 · 古籍原典库 · 紫微斗数全集 / 全书 / 骨髓赋',
-  description: '紫微斗数权威古籍全文检索：《紫微斗数全集》《紫微斗数全书》《骨髓赋》倪海厦《天纪》引证来源',
+  title: biText('倪师方法论 · 古籍原典库 · 紫微斗数全集 / 全书 / 骨髓赋').vi,
+  description: biText('紫微斗数权威古籍全文检索：《紫微斗数全集》《紫微斗数全书》《骨髓赋》倪海厦《天纪》引证来源').vi,
 };
 
 export default function LibraryHomePage() {

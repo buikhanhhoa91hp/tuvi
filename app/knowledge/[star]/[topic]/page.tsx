@@ -48,9 +48,26 @@ export async function generateMetadata({ params }: { params: Promise<{ star: str
   const data = getKnowledge(star, topic as TopicKey);
   if (!data.exists) return {};
 
-  const title = `${star}入${data.palaceName}宫 · ${data.topicLabel} · 倪海厦体系详解`;
+  // Task c5: title/description trong <head> da dich sang tieng Viet (R30) — dao nguoc phan
+  // quyet e0e2140. star / data.palaceName / data.topicLabel la DATA (ten sao, ten cung, ten
+  // chu de cua engine) nen phai đi qua biFmt voi cap placeholder z/v — cung cach voi h1 o
+  // duoi. JSON-LD + mang keywords ben duoi VAN giu ten Hán: do la tu khoa tim kiem va cau
+  // truc co du lieu (khong phai chrome), da khai bao EXCLUDE/TEMPLATE_OK trong ratchet.
+  const title = biFmt('{sz}入{pz}宫 · {tl} · 倪海厦体系详解', {
+    sz: star,
+    pz: data.palaceName,
+    tl: data.topicLabel,
+    sv: biTerm(star, 'star').vi,
+    pv: biTerm(data.palaceName, 'palace').vi,
+    tv: biText(data.topicLabel).vi,
+  }).vi;
   const description = data.parsed.dingdiao
-    || `${star}入${data.palaceName}宫的紫微斗数解读 — 基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》。`;
+    || biFmt('{sz}入{pz}宫的紫微斗数解读 — 基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》。', {
+      sz: star,
+      pz: data.palaceName,
+      sv: biTerm(star, 'star').vi,
+      pv: biTerm(data.palaceName, 'palace').vi,
+    }).vi;
 
   return {
     title,

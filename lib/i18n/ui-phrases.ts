@@ -563,6 +563,143 @@ export const UI_VI: Record<string, string> = {
     'Đặt thêm câu hỏi, ví dụ: năm nào là giai đoạn then chốt trong tình cảm của hai người?', // :340 placeholder
   '分析中…': 'Đang phân tích…',                                       // :357
   '继续追问': 'Đặt câu hỏi tiếp',                                      // :357
+
+  // ── app/privacy/page.tsx (task c5) — trang phap ly. Key lay NGUYEN VAN source,
+  // ke ca dau ： ， 、 （ ） ASCII "..." va dau cach trong `(Alipay / WeChat Pay)`.
+  // Ban dich giu dung ket cau 8 muc + danh sach dem cua ban goc, khong them/bot noi dung.
+  '隐私政策 · 紫微命盘': 'Chính sách bảo mật · Lá số Tử Vi',           // :4 metadata title
+  '紫微命盘隐私政策': 'Chính sách bảo mật của Lá số Tử Vi',            // :5 metadata description
+  '返回首页': 'Về trang chủ',                                          // :14, :72 (dung ca 2 trang + /terms)
+  '最后更新：2026年4月': 'Cập nhật lần cuối: tháng 4 năm 2026',         // :21
+  '1. 我们收集的信息': '1. Thông tin chúng tôi thu thập',               // :23
+  '为提供紫微命盘排盘与解读服务，我们可能收集以下信息：':
+    'Để cung cấp dịch vụ lập và luận giải lá số Tử Vi, chúng tôi có thể thu thập các thông tin sau:', // :24
+  '命盘必要信息': 'Thông tin cần cho lá số',                            // :26
+  '：姓名（选填）、出生公历年月日、出生时辰、性别、出生地经度':
+    ': họ tên (không bắt buộc), ngày tháng năm sinh dương lịch, canh giờ sinh, giới tính, kinh độ nơi sinh', // :26
+  '账号信息（注册后）': 'Thông tin tài khoản (sau khi đăng ký)',         // :27
+  '：手机号（用于短信验证与会员服务）': ': số điện thoại (dùng để xác minh qua SMS và chăm sóc hội viên)', // :27
+  '交互信息': 'Thông tin tương tác',                                    // :28
+  '：你在站内的点击、浏览、命盘历史记录': ': thao tác nhấn, lượt xem và lịch sử lá số của bạn trong trang', // :28
+  '反馈信息': 'Thông tin phản hồi',                                      // :29
+  '：你对解读内容的"准 / 不准"打分与文字反馈':
+    ': điểm "chuẩn / không chuẩn" bạn dành cho nội dung luận giải và phản hồi bằng chữ viết', // :29
+  '支付信息': 'Thông tin thanh toán',                                    // :30
+  '：购买会员或单项服务时通过第三方支付（支付宝 / 微信支付）处理，本平台不存储完整卡号或密码':
+    ': khi mua hội viên hoặc dịch vụ đơn lẻ được xử lý qua nhà cung cấp thanh toán bên thứ ba (Alipay / WeChat Pay); nền tảng này không lưu trữ đầy đủ số thẻ hay mật khẩu', // :30
+  '2. 我们如何使用信息': '2. Chúng tôi sử dụng thông tin như thế nào',    // :33
+  '命盘信息仅用于本次解读与你账号下的历史命盘记录':
+    'Thông tin lá số chỉ dùng cho lần luận giải này và lịch sử lá số trong tài khoản của bạn', // :35
+  '手机号用于注册、登录、订单通知': 'Số điện thoại dùng để đăng ký, đăng nhập và thông báo đơn hàng', // :36
+  '反馈信息用于持续改进命理内容质量（脱敏后聚合分析）':
+    'Thông tin phản hồi dùng để cải thiện liên tục chất lượng nội dung mệnh lý (khử thông tin định danh rồi tổng hợp phân tích)', // :37
+  '聚合数据可能用于行业研究与平台优化': 'Dữ liệu tổng hợp có thể dùng cho nghiên cứu ngành và tối ưu nền tảng', // :38
+  '3. 信息共享与第三方': '3. Chia sẻ thông tin và bên thứ ba',            // :41
+  '除以下情形外，我们不会向第三方共享你的个人信息：':
+    'Ngoài các trường hợp sau, chúng tôi không chia sẻ thông tin cá nhân của bạn với bên thứ ba:', // :42
+  '支付服务商（支付宝 / 微信支付）：处理订单结算':
+    'Nhà cung cấp dịch vụ thanh toán (Alipay / WeChat Pay): xử lý quyết toán đơn hàng', // :44
+  '短信服务商（如阿里云短信）：发送验证码':
+    'Nhà cung cấp dịch vụ SMS (như Alibaba Cloud SMS): gửi mã xác minh', // :45
+  '云服务商（如 Vercel / Cloudflare / 阿里云）：技术承载':
+    'Nhà cung cấp dịch vụ đám mây (như Vercel / Cloudflare / Alibaba Cloud): hạ tầng kỹ thuật', // :46
+  'AI 解读服务（如 Anthropic Claude）：处理你的"自由追问"对话（已做匿名化）':
+    'Dịch vụ luận giải AI (như Anthropic Claude): xử lý các hội thoại "tự do đặt thêm câu hỏi" của bạn (đã được ẩn danh hóa)', // :47
+  '司法机关或政府部门基于法律法规的合法要求':
+    'Yêu cầu hợp pháp của cơ quan tư pháp hoặc cơ quan nhà nước dựa trên quy định của pháp luật', // :48
+  '4. 信息安全': '4. An toàn thông tin',                                // :51
+  '我们采取业界常见的技术与管理手段保护你的信息（HTTPS 传输加密、数据库加密存储、访问权限控制等）。但请注意，互联网传输无法保证 100% 安全。':
+    'Chúng tôi áp dụng các biện pháp kỹ thuật và quản lý phổ biến trong ngành để bảo vệ thông tin của bạn (mã hóa truyền tải HTTPS, lưu trữ mã hóa cơ sở dữ liệu, kiểm soát quyền truy cập, v.v.). Tuy nhiên xin lưu ý rằng truyền tải trên internet không thể bảo đảm an toàn 100%.', // :52
+  '5. 你的权利': '5. Quyền của bạn',                                    // :54
+  '查询': 'Tra cứu',                                                    // :56
+  '：可通过账号中心查看你的所有历史命盘与订单': ': xem toàn bộ lịch sử lá số và đơn hàng của bạn trong trung tâm tài khoản', // :56
+  '删除': 'Xóa',                                                        // :57
+  '：联系客服删除账号下指定命盘 / 注销账号': ': liên hệ bộ phận chăm sóc khách hàng để xóa một lá số được chỉ định trong tài khoản / hủy tài khoản', // :57
+  '导出': 'Xuất dữ liệu',                                                // :58
+  '：可申请导出你的全部个人数据': ': có thể yêu cầu xuất toàn bộ dữ liệu cá nhân của bạn', // :58
+  '6. Cookie 与本地存储': '6. Cookie và lưu trữ cục bộ',                 // :61
+  '本站使用 cookie / localStorage 用于：保存你的暗黑/亮色主题偏好、最近的命盘历史、会员登录状态。你可在浏览器设置中关闭，但部分功能可能受影响。':
+    'Trang này dùng cookie / localStorage để: lưu sở thích giao diện tối/sáng của bạn, lịch sử lá số gần nhất và trạng thái đăng nhập hội viên. Bạn có thể tắt trong cài đặt trình duyệt, nhưng một số chức năng có thể bị ảnh hưởng.', // :62
+  '7. 未成年人': '7. Người chưa thành niên',                             // :64
+  '本平台命理内容面向 18 岁以上成年用户。未成年人请在监护人同意下使用，并不得将解读用于重大人生决策。':
+    'Nội dung mệnh lý của nền tảng dành cho người dùng trưởng thành từ 18 tuổi trở lên. Người chưa thành niên chỉ sử dụng khi có sự đồng ý của người giám hộ, và không được dùng nội dung luận giải cho những quyết định lớn của cuộc đời.', // :65
+  '8. 政策变更': '8. Thay đổi chính sách',                               // :67
+  '本政策可能不定期更新。重大变更将以显著方式通知。继续使用即表示同意更新后的版本。':
+    'Chính sách này có thể được cập nhật mà không theo kỳ hạn cố định. Các thay đổi lớn sẽ được thông báo bằng hình thức rõ ràng. Tiếp tục sử dụng nghĩa là bạn đồng ý với phiên bản đã cập nhật.', // :68
+
+  // ── app/terms/page.tsx (task c5) — trang phap ly. 7 muc + kho cam ①②③④ giu nguyen
+  // danh va ket cau; `**...**` la dau nhan ban trong goc nen ban Viet giu dung no.
+  '服务条款 · 紫微命盘': 'Điều khoản dịch vụ · Lá số Tử Vi',            // :1 metadata title
+  '紫微命盘服务条款与用户协议': 'Điều khoản dịch vụ và thỏa thuận người dùng của Lá số Tử Vi', // :1 metadata description
+  '1. 服务概述': '1. Tổng quan dịch vụ',                                // :19
+  '紫微命盘（以下简称"本平台"）基于倪海厦《天纪》紫微斗数体系提供命盘排盘与解读服务。本平台所有命理内容仅供参考，':
+    'Lá số Tử Vi (sau đây gọi tắt là "nền tảng này") cung cấp dịch vụ lập và luận giải lá số theo hệ thống Tử Vi đẩu số trong Thiên Kỷ của thầy Ni Hải Hạ. Toàn bộ nội dung mệnh lý của nền tảng này chỉ mang tính tham khảo,', // :20
+  '不构成任何医疗、投资、法律、心理咨询或人生重大决策建议':
+    'không cấu thành bất kỳ khuyến nghị nào về y tế, đầu tư, pháp lý, tư vấn tâm lý hay quyết định lớn của cuộc đời', // :20
+  '2. 用户行为规范': '2. Quy tắc hành vi người dùng',                    // :22
+  '使用本平台即表示您同意：': 'Sử dụng nền tảng này nghĩa là bạn đồng ý:', // :23
+  '仅出于合法、个人参考目的使用本平台': 'chỉ sử dụng nền tảng vì mục đích hợp pháp và tham khảo cá nhân', // :25
+  '不传播本平台内容用于商业销售、转载或公开发布':
+    'không lan truyền nội dung nền tảng nhằm bán thương mại, đăng lại hoặc công bố công khai', // :26
+  '不进行扰乱平台正常运行的行为': 'không thực hiện hành vi làm rối loạn hoạt động bình thường của nền tảng', // :27
+  '提交的出生信息真实有效；本平台对错误信息导致的解读偏差不承担责任':
+    'khai sinh bạn cung cấp phải chân thực và hợp lệ; nền tảng không chịu trách nhiệm cho sai lệch luận giải do thông tin sai gây ra', // :28
+  '3. 知识产权与禁止条款 · 反爬反训练':
+    '3. Sở hữu trí tuệ và điều khoản cấm · chống thu thập tự động, chống huấn luyện mô hình', // :31
+  '本平台所有命理内容、知识库（含 14 主星 × 12 宫 × 男女 × 四化 × 大限流年的全部解读文本）、UI 设计、算法整合方案、案例库均为本平台原创或经合法整理。':
+    'Toàn bộ nội dung mệnh lý, kho tri thức (bao gồm mọi văn bản luận giải theo 14 chính tinh × 12 cung × nam nữ × tứ hóa × đại hạn lưu niên), thiết kế UI, phương án tích hợp thuật toán và kho ví dụ điển hình của nền tảng đều do nền tảng tự sáng tạo hoặc được biên tập hợp pháp.', // :33
+  '严格禁止以下行为，违者保留追究民事赔偿与刑事责任的权利：':
+    'Cấm nghiêm ngặt các hành vi sau đây; với người vi phạm, chúng tôi bảo lưu quyền truy cứu bồi thường dân sự và trách nhiệm hình sự:', // :34
+  '① 通过爬虫、自动化脚本、批量调用 API 等任何技术手段抓取本平台内容；':
+    '① thu thập nội dung nền tảng bằng bất kỳ phương tiện kỹ thuật nào như crawler, script tự động, gọi API hàng loạt;', // :35
+  '② 将本平台生成的命盘解读、文本、API 响应数据**用于训练任何机器学习模型**（含但不限于大语言模型、命理生成模型、文本生成模型等）；':
+    '② dùng văn bản luận giải lá số, văn bản và dữ liệu phản hồi API do nền tảng tạo ra **để huấn luyện bất kỳ mô hình học máy nào** (bao gồm nhưng không giới hạn ở mô hình ngôn ngữ lớn, mô hình sinh mệnh lý, mô hình sinh văn bản);', // :36
+  '③ 将本平台生成的内容转售、发布到其他网站、APP、自媒体账号；':
+    '③ bán lại hoặc đăng nội dung do nền tảng tạo ra lên website, ứng dụng hoặc tài khoản truyền thông khác;', // :37
+  '④ 反编译、复制、修改本平台前端或后端代码并以"自营"方式提供同类服务。':
+    '④ dịch ngược, sao chép, chỉnh sửa mã frontend hoặc backend của nền tảng và cung cấp dịch vụ cùng loại theo hình thức "tự vận hành kinh doanh".', // :38
+  '本平台输出文本嵌入有指纹追溯水印，违规复制 / 训练所产生的输出可被检测追溯。一经发现违规，本平台有权要求 ':
+    'Văn bản đầu ra của nền tảng được nhúng watermark truy vết theo dấu vết; đầu ra sinh ra từ việc sao chép / huấn luyện trái phép có thể bị phát hiện và truy vết. Khi phát hiện vi phạm, nền tảng có quyền yêu cầu ', // :39 (key ket thuc bang 1 dau cach ASCII — source noi tiep <strong>)
+  '每例违约赔偿 100 万元人民币': 'bồi thường vi phạm 1.000.000 nhân dân tệ cho mỗi vụ', // :39
+  '，并保留向法院提起诉讼及配合公安机关调查的权利。':
+    ', đồng thời bảo lưu quyền khởi kiện ra tòa án và phối hợp với cơ quan công an điều tra.', // :39
+  '4. 免责声明': '4. Tuyên bố miễn trừ trách nhiệm',                      // :42
+  '本平台命理内容基于传统紫微斗数与倪海厦体系的知识整理，':
+    'Nội dung mệnh lý của nền tảng được biên tập từ kiến thức Tử Vi đẩu số truyền thống và hệ thống Ni Hải Hạ,', // :43
+  '不保证 100% 准确': 'không bảo đảm chính xác 100%',                     // :43
+  '。命运受天、地、人三才共同影响，本平台输出仅作为认识自我的参考，使用者应理性看待，不应过度依赖任何单一命理判断。':
+    '. Vận mệnh chịu tác động chung của Thiên – Địa – Nhân (ba ngôi tam tài), nên đầu ra của nền tảng chỉ là tài liệu tham khảo để hiểu bản thân; người dùng nên nhìn nhận một cách lý trí, không phụ thuộc quá mức vào bất kỳ nhận định mệnh lý đơn lẻ nào.', // :43
+  '因使用本平台内容产生的任何后果（包括但不限于决策失误、心理影响、关系变化等），本平台不承担法律责任。':
+    'Nền tảng không chịu trách nhiệm pháp lý đối với bất kỳ hệ quả nào phát sinh từ việc sử dụng nội dung nền tảng (bao gồm nhưng không giới hạn ở quyết định sai, ảnh hưởng tâm lý, thay đổi quan hệ, v.v.).', // :44
+  '5. 服务变更与终止': '5. Thay đổi và chấm dứt dịch vụ',                  // :46
+  '本平台保留随时调整、暂停或终止部分或全部服务的权利。重大变更将以站内公告或邮件方式通知用户。':
+    'Nền tảng bảo lưu quyền điều chỉnh, tạm ngừng hoặc chấm dứt một phần hay toàn bộ dịch vụ vào bất kỳ lúc nào. Các thay đổi lớn sẽ được thông báo tới người dùng bằng công bố trong trang hoặc qua email.', // :47
+  '6. 法律适用与争议解决': '6. Luật áp dụng và giải quyết tranh chấp',     // :49
+  '本条款适用中华人民共和国法律。若发生争议，双方应友好协商；协商不成的，提交本平台运营主体所在地有管辖权的人民法院诉讼解决。':
+    'Điều khoản này chịu sự điều chỉnh của pháp luật nước Cộng hòa Nhân dân Trung Hoa. Nếu phát sinh tranh chấp, hai bên thương lượng trên tinh thần hữu hảo; nếu thương lượng không thành, khởi kiện tại tòa án nhân dân có thẩm quyền nơi chủ thể vận hành nền tảng đóng trụ sở.', // :50
+  '7. 联系方式': '7. Thông tin liên hệ',                                  // :52
+  '如有疑问，请通过本平台公布的客服微信 / 邮箱联系。':
+    'Nếu còn thắc mắc, xin liên hệ qua WeChat chăm sóc khách hàng hoặc email đã được nền tảng công bố.', // :53
+
+  // ── metadata <head> (task c5) — title/description/keywords cua root layout + 3 page ──
+  // Phan quyet e0e2140 (SEO metadata giu nguyen Han) DUOC DAO NGUOC o dot C-5: day la chu
+  // nguoi doc nhin thay (ket qua tim kiem, preview link) nen phai tieng Viet. goi qua
+  // biText(...).vi o vi tri module-level → chay luc import, pure, khong side effect.
+  '紫微命盘 · 倪海厦正宗紫微斗数': 'Lá số Tử Vi · Tử Vi đẩu số chính truyền Ni Hải Hạ', // app/layout.tsx title + OG title
+  '基于倪海厦正宗紫微斗数体系，AI深度解读您的命盘格局、大限流年、感情事业财富健康全方位解析':
+    'Dựa trên hệ thống Tử Vi đẩu số chính truyền của thầy Ni Hải Hạ, AI luận giải chuyên sâu cách cục lá số, đại hạn lưu niên, cùng tình cảm, sự nghiệp, tài phú và sức khỏe của bạn', // app/layout.tsx description + OG description
+  '紫微斗数, 倪海厦, 紫微斗数全集, 紫微斗数全书, 骨髓赋, 命盘, 命理, 14主星, 12宫位':
+    'Tử Vi đẩu số, Ni Hải Hạ, Tử Vi Đẩu Số Toàn Tập, Tử Vi Đẩu Số Toàn Thư, Cốt Tủy Phú, lá số, mệnh lý, 14 chính tinh, 12 cung', // app/layout.tsx keywords
+  '紫微研究': 'Nghiên cứu Tử Vi',                                       // app/layout.tsx OG siteName
+  '紫微斗数知识库 · 14 主星 × 13 宫位 · 倪海厦正宗体系':
+    'Kho tri thức Tử Vi đẩu số · 14 chính tinh × 13 cung · hệ chính truyền Ni Hải Hạ', // app/knowledge/page.tsx title
+  '基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》编纂的紫微斗数知识库。覆盖 14 主星在 13 个宫位的完整论断，含一句话定调、核心论断、命盘依据、经典出处。':
+    'Kho tri thức Tử Vi đẩu số được biên soạn theo hệ Thiên Kỷ của thầy Ni Hải Hạ cùng cổ thư Tử Vi Đẩu Số Toàn Tập và Cốt Tủy Phú. Bao quát luận giải đầy đủ của 14 chính tinh tại 13 cung, gồm câu định giọng, luận giải cốt lõi, căn cứ trên lá số và xuất xứ kinh điển.', // app/knowledge/page.tsx description
+  '倪师方法论 · 古籍原典库 · 紫微斗数全集 / 全书 / 骨髓赋':
+    'Phương pháp luận của Ni sư · Kho cổ thư nguyên bản · Tử Vi Đẩu Số Toàn Tập / Toàn Thư / Cốt Tủy Phú', // app/library/page.tsx title
+  '紫微斗数权威古籍全文检索：《紫微斗数全集》《紫微斗数全书》《骨髓赋》倪海厦《天纪》引证来源':
+    'Tra cứu toàn văn các cổ thư Tử Vi đẩu số có thẩm quyền: Tử Vi Đẩu Số Toàn Tập, Tử Vi Đẩu Số Toàn Thư, Cốt Tủy Phú — nguồn dẫn chứng trong Thiên Kỷ của thầy Ni Hải Hạ', // app/library/page.tsx description
+  '搜索 · 古籍原典库': 'Tìm kiếm · Kho cổ thư nguyên bản',              // app/library/search/page.tsx title
 };
 
 /**
@@ -629,4 +766,13 @@ export const UI_FMT_VI: Record<string, string> = {
   // {bt} = book.title — DATA tu lib/classics/data/* nen ca hai vế giữ《…》nguyên văn;
   // chi '目录' la chrome → 'Mục lục'.
   '← 《{bt}》目录': '← Mục lục《{bt}》',                // app/library/[book]/[chapter]/page.tsx dieu huong
+
+  // ── app/knowledge/[star]/[topic]/page.tsx generateMetadata (task c5) ──
+  // Placeholder z (sz/pz/tl) dien ten sao/cung/chu de la DATA nguyen van Han (de vế zh tai
+  // hien dung chuoi trang tung in); placeholder v (sv/pv/tv) dien thuat ngu Viet — cung kieu
+  // h1 (:142) va '{z}·{s}年四化：' cua TimeNav. Day la 2 chuoi TRAN trong biFmt( → ratchet
+  // nhin thay, khong can khai bao TEMPLATE_OK nua.
+  '{sz}入{pz}宫 · {tl} · 倪海厦体系详解': '{sv} nhập cung {pv} · {tv} · chi tiết theo hệ Ni Hải Hạ', // metadata title
+  '{sz}入{pz}宫的紫微斗数解读 — 基于倪海厦《天纪》体系与古籍《紫微斗数全集》《骨髓赋》。':
+    '{sv} nhập cung {pv} — luận giải Tử Vi đẩu số, biên soạn theo hệ Thiên Kỷ của thầy Ni Hải Hạ cùng cổ thư Tử Vi Đẩu Số Toàn Tập / Cốt Tủy Phú.', // metadata description (fallback)
 };

@@ -11,15 +11,15 @@ export async function generateStaticParams() {
   return ALL_BOOKS.map(b => ({ book: b.slug }));
 }
 
-// Metadata SEO giu nguyen tieng Trung (phan quyet commit e0e2140): title noi suy ten
-// co thu + trieu dai (DATA tu lib/classics/data/*) → khai bao TEMPLATE_OK trong ratchet.
-// description = book.intro: gia tri data, khong phai literal → extractor khong nhin thay.
+// Task c5 (dot C): phan CHROME cua metadata da dich sang tieng Viet. Ten co thu + trieu dai
+// trong template la DATA tu lib/classics/data/* (khong duoc sua o dot nay) nen van de nguyen;
+// vi the khong con dong template cua file nay trong TEMPLATE_OK cua ratchet.
 export async function generateMetadata({ params }: { params: Promise<{ book: string }> }) {
   const { book: slug } = await params;
   const book = getBookBySlug(slug);
   if (!book) return {};
   return {
-    title: `《${book.title}》· ${book.dynasty} · 紫微斗数古籍原典库`,
+    title: `《${book.title}》· ${book.dynasty} · Kho cổ thư nguyên bản Tử Vi đẩu số`,
     description: book.intro,
   };
 }
