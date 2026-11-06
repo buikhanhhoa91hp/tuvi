@@ -149,6 +149,11 @@ export interface BiPair {
 
 - [ ] **Step 4: Tạo `scripts/i18n/sync-terms.ts`**
 
+> **Nguồn chuẩn là file đã commit** `scripts/i18n/sync-terms.ts` (xem `git log` cho task này),
+> không phải đoạn dưới đây. Đoạn này là bản thiết kế ban đầu và **thiếu** hai sửa đổi đã chốt:
+> guard vòng suffix cung (đã sửa ở Task 1) cùng `skippedSuffix` + `throw` khi value undefined
+> (R9, fix round 1). Copy nguyên đoạn này sẽ tái sinh đúng hai lỗi mà review đã bắt.
+
 ```ts
 /**
  * Sinh lib/i18n/terms.generated.ts từ bảng locale vi-VN / zh-CN của iztro.
