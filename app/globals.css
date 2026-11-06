@@ -443,5 +443,7 @@ body {
 .bi { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.25; }
 .bi-vi { white-space: nowrap; }
 .bi-zh { font-size: 0.68em; opacity: 0.5; letter-spacing: 0.02em; white-space: nowrap; }
-/* Ô lá số rất hẹp: ẩn bớt chữ Hán dưới 640px để không tràn ô */
-@media (max-width: 640px) { .bi-compact .bi-zh { display: none; } }
+/* Ô lá số rất hẹp: ẩn bớt chữ Hán DƯỚI 640px để không tràn ô.
+   639px chứ không phải 640px (R27): Tailwind `sm` là min-width:640px, nên max-width:640px
+   làm viewport đúng 640px khớp CẢ HAI — chữ Hán bị ẩn ngay trên breakpoint desktop. */
+@media (max-width: 639px) { .bi-compact .bi-zh { display: none; } }
