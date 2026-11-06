@@ -36,7 +36,7 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
   // (ChartBoard.tsx:81-85, `timeView === 'daxian' ? … : timeView === 'liunian' ? …`). Một chữ
   // ở terms.override, chữ kia ở UI_VI là phá quy tắc một nguồn — guard `UI_VI ∩ hasTerm = ∅`
   // sẽ fail đúng vào ngày '年' được khai là thuật ngữ. Nên '年' về đây, đứng cạnh '限';
-  // '闰' (nhãn tháng nhuận, ChartBoard.tsx:221) thì ở lại UI_VI.
+  // '闰' (nhãn tháng nhuận, ChartBoard.tsx:222) thì ở lại UI_VI.
   //
   // R19 — QUYẾT ĐỊNH BẰNG RENDER THẬT (Task 7, /chart, sinh lá số 1990-06-15 giờ 巳, viewport
   // 1280px, nút 流年 của TimeNav trong ChartBoard; badge overlay = pill 8px [nhãn][tứ hóa]):
@@ -59,18 +59,18 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
 
   // ── (a) iztro thiếu: DẠNG ĐẦY ĐỦ của tứ hóa (hai âm tiết) ──
   // Namespace mutagen của iztro CHỈ có bốn chữ một âm 禄权科忌 (xem terms.generated.ts),
-  // nên 化禄/化权/化科/化忌 không tồn tại ở bất kỳ bảng nào — trong khi ChartBoard.tsx:315-318
+  // nên 化禄/化权/化科/化忌 không tồn tại ở bất kỳ bảng nào — trong khi ChartBoard.tsx:316-319
   // in đúng bốn chuỗi hai âm đó làm chú giải màu. Không đổi component về một chữ: chú giải
   // phải đọc 'Hóa Lộc' mới đúng thuật ngữ Việt, và '禄' một chữ là dạng badge trong ô cung.
   { zh: '化禄', vi: 'Hóa Lộc', kind: 'mutagen',
-    note: "ChartBoard.tsx:315 (chú giải màu tứ hóa). Dạng đầy đủ của '禄'='Lộc' " +
+    note: "ChartBoard.tsx:316 (chú giải màu tứ hóa). Dạng đầy đủ của '禄'='Lộc' " +
           "(mutagen một âm, đã có trong generated); thêm 化 để không nhầm với sao 禄存." },
   { zh: '化权', vi: 'Hóa Quyền', kind: 'mutagen',
-    note: "ChartBoard.tsx:316. Dạng đầy đủ của '权'='Quyền' (mutagen một âm trong generated)." },
+    note: "ChartBoard.tsx:317. Dạng đầy đủ của '权'='Quyền' (mutagen một âm trong generated)." },
   { zh: '化科', vi: 'Hóa Khoa', kind: 'mutagen',
-    note: "ChartBoard.tsx:317. Dạng đầy đủ của '科'='Khoa' (mutagen một âm trong generated)." },
+    note: "ChartBoard.tsx:318. Dạng đầy đủ của '科'='Khoa' (mutagen một âm trong generated)." },
   { zh: '化忌', vi: 'Hóa Kỵ', kind: 'mutagen',
-    note: "ChartBoard.tsx:318. Dạng đầy đủ của '忌'='Kỵ' (mutagen một âm trong generated); " +
+    note: "ChartBoard.tsx:319. Dạng đầy đủ của '忌'='Kỵ' (mutagen một âm trong generated); " +
           "progress Task 2 đo hasTerm('化忌')===false nên override là đường duy nhất." },
 
   // ── (a) thập nhị canh chố dưới dạng 时 ──

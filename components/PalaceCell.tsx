@@ -5,7 +5,7 @@ import type { Palace, Star } from '@/lib/ziwei/types';
 import { STEMS, BRANCHES } from '@/lib/ziwei/constants';
 import clsx from 'clsx';
 import Bi from './Bi';
-import { biTerm } from '@/lib/i18n/resolve';
+import { biTerm, viPillar } from '@/lib/i18n/resolve';
 
 interface PalaceCellProps {
   palace: Palace;
@@ -77,7 +77,7 @@ export default function PalaceCell({
   overlayStarSiHua, overlayLabel, onSiHuaClick,
 }: PalaceCellProps) {
   const { branch, stem, name, stars, daXianAge, isCurrentDaXian, isMingGong, isShenGong } = palace;
-  const ganzhi = `${STEMS[stem]}${BRANCHES[branch]}`;
+  const ganzhi = `${STEMS[stem]}${BRANCHES[branch]}`, pillar = viPillar(ganzhi);
 
   const majorStars = stars.filter(s => s.type === 'major');
   const luckyStars = stars.filter(s => s.type === 'lucky');
@@ -139,8 +139,25 @@ export default function PalaceCell({
         )}
       </div>
 
-      {/* 干支 */}
-      <div className="text-[9px] font-mono mb-1" style={{ color: 'var(--t-faint)', opacity: 0.75 }}>{ganzhi}</div>
+      {/* Thiên Can Địa Chi của cung. ĐÂY LÀ GIÁ TRỊ NỘI SUY lúc chạy
+          (`${STEMS[stem]}${BRANCHES[branch]}`, constants.ts:2,5) nên ratchet R28 vô hình với nó —
+          nó đo literal, không đo kết quả nội suy: để `{ganzhi}` trần thì người Việt nhận '丙辰'
+          giữa bàn lá số đã song ngữ. Lớp dịch đúng là viPillar: nó tách '丙'+'辰' và ghép
+          'Bính Thìn' (biTerm('丙辰') thì missing → vẫn in chữ Hán, vì không khóa 2 chữ nào trong
+          bảng). Cách in mô phỏng đúng Bi.tsx:27-34 — Việt là dòng chính, Hán phụ, lang="zh-Hans"
+          bắt buộc (R25) — cùng chiều với cách ChartBoard.tsx:184 render chi bằng
+          <Bi mode="term" … kind="branch">. Không gọi <Bi> trực tiếp ở đây vì props của nó
+          (mode term/text/fmt) không nhận một cặp can+chi đã ghép. */}
+      <div className="text-[9px] font-mono mb-1" style={{ color: 'var(--t-faint)', opacity: 0.75 }}>
+        {pillar.missing
+          ? <span className="bi bi-cell bi-compact" lang="zh-Hans">{pillar.zh}</span>
+          : (
+            <span className="bi bi-cell bi-compact">
+              <span className="bi-vi" lang="vi">{pillar.vi}</span>
+              <span className="bi-zh" lang="zh-Hans">{pillar.zh}</span>
+            </span>
+          )}
+      </div>
 
       {/* 主星 */}
       <div className="flex flex-col gap-0.5 flex-1">

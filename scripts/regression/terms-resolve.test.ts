@@ -61,6 +61,11 @@ const halfUnknown = viPillar('庚鼖'); // '鼖' không phải chi nào
 ok(halfUnknown.missing === true && halfUnknown.vi === '庚鼖', 'mot nura unknown -> missing=true, vi===zh (khong hoi noi Viet)');
 ok(viPillar('壬子').missing === false && viPillar('壬子').vi === 'Nhâm Tý', "viPillar('壬子') -> 'Nhâm Tý'");
 ok(viPillar('干').missing === true, 'khong phai 2 chu -> missing (can don khong phai tru)');
+// 6c. GANZHI TRONG 12 O CUNG (PalaceCell render `STEMS[stem] + BRANCHES[branch]`, constants.ts:2,5)
+//     la gia tri NOI SUY luc chay nen ratchet R28 vo hinh — no do literal, khong do ket qua noi
+//     suy, va cung do chinh PalaceCell tung con in '{ganzhi}' tran. Chot bang chuoi ghép that
+//     cua bang (can Bính + chi Thìn): thieu lop dich thi nguoi doc Viet thay '丙辰' giữa bàn đã Việt.
+ok(viPillar('丙辰').missing === false && viPillar('丙辰').vi === 'Bính Thìn', "viPillar('丙辰') -> 'Bính Thìn' (ganzhi trong 12 o cung)");
 
 // 7. R13 guard: mọi OverrideEntry phải có vi và note khác rỗng.
 //    vi rỗng là đường hỏng IM LẶNG: resolve.ts:17 `if (vi) return vi;` bỏ qua override rồi
@@ -75,7 +80,7 @@ ok(OVERRIDE_TERMS.every((e) => e.note.trim() !== ''),
 
 // 8. Task 7 — các giá trị mà KHÔNG gate nào khác bảo vệ:
 //    (a) 化禄/化权/化科/化忌 là DẠNG ĐẦY ĐỦ của tứ hóa, iztro mutagen chỉ có một âm nên
-//        sync không sinh ra; ChartBoard.tsx:315-318 render chúng qua <Bi mode="term">. Xóa
+//        sync không sinh ra; ChartBoard.tsx:316-319 render chúng qua <Bi mode="term">. Xóa
 //        override thì ratchet VẪN XANH (lời dịch biTerm được miễn điều kiện bảng — R28 (b)
 //        chỉ áp cho câu), và chart-name-coverage không quét tới (engine không phát sinh
 //        chuỗi 化X). Vì vậy giá trị phải chốt ở đây.
