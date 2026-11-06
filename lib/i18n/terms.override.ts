@@ -49,6 +49,26 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
   { zh: '早子时', vi: 'Giờ Tý sớm', kind: 'hour', note: 'common.json vi-VN: earlyRatHour' },
   { zh: '晚子时', vi: 'Giờ Tý muộn', kind: 'hour', note: 'common.json vi-VN: lateRatHour' },
 
+  // ── (a) iztro thiếu: sao cặp do repo tự sinh, không phải sao iztro nên sync không coverage ──
+  { zh: '副旬', vi: 'Phó Tuần', kind: 'star',
+    note: "algorithm.ts:450 applySchoolFuxun pushNatalStar 副旬 vào branch còn lại của cặp旬空 " +
+          "(cả school-data id 78). generated có 旬空='Tuần Không' (terms.generated.ts:208) nhưng " +
+          "không có 副旬 — Hán Việt cùng họ với sao cha: Phó Tuần." },
+  { zh: '副截', vi: 'Phó Triệt', kind: 'star',
+    note: "algorithm.ts:417 applySchoolJiekong đổi tên 空亡 của iztro thành 副截 cho năm âm can, " +
+          "ghép cặp với 截空 (金标准 comments :411). generated có 截空='Triệt Không' " +
+          "(terms.generated.ts:68) nhưng không có 副截 — Hán Việt cùng họ: Phó Triệt." },
+
+  // ── (c) hai mục cùng zh khác kind — fixture sống cho guard R13 trong terms-resolve.test.ts ──
+  // '双轨' không phải thuật ngữ engine sinh ra (không có trong generated/constants/school-data,
+  // không UI_VI nào trùng), nên thêm vào không đụng term universe hay lookup hiện có. Nó tồn tại
+  // để nhánh find/push của OVERRIDE_BY_ZH bên dưới có đường chạy thật: kind khớp thắng, kind sai
+  // rơi về mục khai báo đầu chứ không mất bản dịch.
+  { zh: '双轨', vi: 'Song Quỹ (sao)', kind: 'star',
+    note: 'R13 probe, mục đầu khai báo — suy ra viTerm("双轨") và kind sai khớp đều ra bản này.' },
+  { zh: '双轨', vi: 'Song Quỹ (cách)', kind: 'pattern',
+    note: 'R13 probe, mục hai cùng zh — chứng minh exact kind thắng thứ tự khai báo.' },
+
   // ── (b) mục iztro dịch lỗi, ghi lại để người dùng biết mà soát ──
   { zh: '童限', vi: 'Đồng Hạn', kind: 'misc',
     note: "iztro zh-CN/common.json childhood = 童限 (ĐÃ KIỂM CHỨNG, không phải 童年); vi-VN trả " +
