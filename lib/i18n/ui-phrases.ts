@@ -27,15 +27,23 @@ export const UI_VI: Record<string, string> = {
   '请选择日期': 'Vui lòng chọn ngày',                               // :96
   '年份范围：1900–2026': 'Năm phải trong khoảng 1900–2026',          // :93 (– là U+2013)
 
-  // ── components/ChartBoard.tsx ──
-  '紫微斗数命盘': 'Lá số Tử Vi',                                   // :111
-  '紫微斗数': 'Tử Vi đẩu số',                                       // :161
-  '当前大限': 'Đại hạn hiện tại',                                    // :174
-  // :75 `timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年'` — cả hai nhãn của
-  // cùng một biểu thức đều là THUẬT NGỮ, nên ở terms.override.ts (R12 + R15), không ở đây.
-  // '闰' thì khác: đó là tiếp đầu tố 'tháng nhuận' của lịch âm (:182), không phải thuật ngữ;
+  // ── components/ChartBoard.tsx (số dòng sau Task 7, khi mỗi chuỗi đã nằm trong <Bi>) ──
+  '紫微斗数命盘': 'Lá số Tử Vi',                                   // :122
+  '紫微斗数': 'Tử Vi đẩu số',                                       // :176
+  '当前大限': 'Đại hạn hiện tại',                                    // :205
+  '点击宫位看三方四正': 'Nhấn một cung để xem tam phương tứ chính',   // :325, chú giải dưới bàn lá số
+  // :81-84 `timeView === 'daxian' ? <Bi … zh="限"> : <Bi … zh="年">` — cả hai nhãn của cùng
+  // một biểu thức đều là THUẬT NGỮ, nên ở terms.override.ts (R12 + R15), không ở đây.
+  // '闰' thì khác: đó là tiếp đầu tố 'tháng nhuận' của lịch âm (:221), không phải thuật ngữ;
   // ngày nào nó thành thuật ngữ thì guard `UI_VI ∩ hasTerm = ∅` phải báo — guard đang làm việc.
-  '闰': 'nhuận',                                                    // :182
+  '闰': 'nhuận',                                                    // :221
+
+  // ── components/PalaceCell.tsx ──
+  // '空宫' là nhãn PLACEHOLDER của UI khi cung không có chính tinh (PalaceCell.tsx:149).
+  // Engine không bao giờ phát ra chuỗi này (Palace.name lấy nguyên từ iztro, algorithm.ts:572)
+  // nên nó là CÂU của UI, không phải thuật ngữ — guard ui-phrases.test.ts:45
+  // (`UI_VI ∩ hasTerm = ∅`) chứng minh nó không trùng mục thuật ngữ nào.
+  '空宫': 'Cung trống',                                             // :149
 
   // ── app/chart/page.tsx ──
   '紫微斗数排盘': 'Lập lá số Tử Vi',                                 // :30
@@ -67,5 +75,10 @@ export const UI_FMT_VI: Record<string, string> = {
   '{y}年{m}月{d}日': '{d}/{m}/{y}',                   // BirthForm.tsx:115 (call site pad: '15/06/1990')
   '{m}月没有{d}日': 'Ngày {d} không có trong tháng {m}', // BirthForm.tsx:97 (không pad: 'tháng 2', không phải 'tháng 02')
   '{m} 月': 'Tháng {m}',                               // BirthForm.tsx:263 `<option>{mo} 月</option>` (dấu cách U+0020 trước 月)
-  '{n}岁': '{n} tuổi',                                 // chưa có source trần nào; ChartBoard.tsx:175 là `{dx.startAge}–{dx.endAge}岁` — Task 7 khai báo key '{n1}–{n2}岁' riêng (R7)
+  '{n}岁': '{n} tuổi',                                 // chưa có call site nào; ChartBoard dùng dạng HAI số, khai báo riêng bên dưới (R7)
+  // ChartBoard.tsx:211 (TRƯỚC Task 7) viết `<div>{dx.startAge}–{dx.endAge}岁</div>` — JSX text
+  // CHEN biểu thức nên extractor không thấy nó (R29a, blind spot có chủ đích). Task 7 đổi sang
+  // <Bi mode="fmt" template="{n1}–{n2}岁" …/> : chuỗi trần khai báo trong lời dịch → thấy được,
+  // và vì thế KHÔNG cần dòng nào trong TEMPLATE_OK của ratchet (R7 đường (a)).
+  '{n1}–{n2}岁': '{n1}–{n2} tuổi',                     // ChartBoard.tsx:211 (dấu – là U+2013, giống source)
 };

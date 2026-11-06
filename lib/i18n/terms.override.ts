@@ -32,16 +32,46 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
   { zh: '限', vi: 'Hạn', kind: 'misc',
     note: "iztro zh-CN/common.json decadal='大限' → vi-VN 'Đại Hạn' — 限 đứng một đoạn là 'Hạn' " +
           "(đại hạn/lưu hạn). Không sinh ra từ sync (R5 loại common.json) nên override là đường duy nhất." },
-  // R15: '限' và '年' là hai nhãn của CÙNG một biểu thức ở ChartBoard.tsx:75
-  // (`timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年'`). Một chữ ở
-  // terms.override, chữ kia ở UI_VI là phá quy tắc một nguồn — guard
-  // `UI_VI ∩ hasTerm = ∅` sẽ fail đúng vào ngày '年' được khai là thuật ngữ. Nên '年'
-  // về đây, đứng cạnh '限'; '闰' (nhãn tháng nhuận, :182) thì ở lại UI_VI.
-  { zh: '年', vi: 'Lưu niên', kind: 'misc',
-    note: "Nhãn temporal ghép cặp với '限' trong overlayLabel của ChartBoard.tsx:75 (chế độ xem " +
-          "lưu niên). iztro zh-CN/common.json yearly='流年' → vi-VN 'Lưu Niên', nên bản Việt " +
-          "chuẩn của '年' ở ngữ cảnh này là 'Lưu niên'. common.json bị R5 loại khỏi sync nên " +
+  // R15: '限' và '年' là hai nhãn của CÙNG một biểu thức sinh overlayLabel
+  // (ChartBoard.tsx:81-85, `timeView === 'daxian' ? … : timeView === 'liunian' ? …`). Một chữ
+  // ở terms.override, chữ kia ở UI_VI là phá quy tắc một nguồn — guard `UI_VI ∩ hasTerm = ∅`
+  // sẽ fail đúng vào ngày '年' được khai là thuật ngữ. Nên '年' về đây, đứng cạnh '限';
+  // '闰' (nhãn tháng nhuận, ChartBoard.tsx:221) thì ở lại UI_VI.
+  //
+  // R19 — QUYẾT ĐỊNH BẰNG RENDER THẬT (Task 7, /chart, sinh lá số 1990-06-15 giờ 巳, viewport
+  // 1280px, nút 流年 của TimeNav trong ChartBoard; badge overlay = pill 8px [nhãn][tứ hóa]):
+  //   'Lưu niên' → 4 pill rộng 68.0 / 71.3 / 77.6 / 82.9 px trong ô cung 211px, và hàng phụ
+  //                tinh của cung 官禄 (Quan Lộc) BỊ ĐẨY XUỐNG DÒNG: "Văn Xương [Lưu niên年
+  //                Khoa科] Thiên Thọ" → Thiên Thọ rơi xuống hàng dưới.
+  //   'Niên'     → 4 pill 53.0 / 56.3 / 62.6 / 67.9 px, 0 hàng bị đẩy (đo cùng lá số, cùng
+  //                viewport, chỉ đổi textContent của .bi-vi trong pill).
+  // '限'='Hạn' một âm thì chưa từng vỡ. CHỌN 'Niên': một âm, đối xứng 'Hạn'/'Niên', vẫn là âm
+  // Hán-Việt đúng của 年 mà người đọc Tử Vi Việt nhận ra. Đổi MỘT chỗ này (đang đọc là nguồn
+  // duy nhất), không thêm nguồn nhãn thứ hai cho badge; dạng đầy đủ 'Lưu Niên' (iztro
+  // common.json yearly) nếu câu UI nào cần thì khai báo trong UI_VI.
+  { zh: '年', vi: 'Niên', kind: 'misc',
+    note: "Nhãn temporal ghép cặp với '限'='Hạn' trong overlayLabel của ChartBoard.tsx:81-85 " +
+          "(chế độ xem lưu niên), in trong pill 8px cạnh ký tự tứ hóa. iztro zh-CN/common.json " +
+          "yearly='流年' → vi-VN 'Lưu Niên', nhưng R19 đo thật ở 1280px: 'Lưu niên' làm pill " +
+          "68–83px trong ô 211px và đẩy hàng phụ tinh cung 官禄 xuống dòng → lấy một âm 'Niên' " +
+          "(53–68px, không vỡ hàng), đối xứng với 'Hạn'. common.json bị R5 loại khỏi sync nên " +
           "generated không có mục này — override là đường duy nhất (R15)." },
+
+  // ── (a) iztro thiếu: DẠNG ĐẦY ĐỦ của tứ hóa (hai âm tiết) ──
+  // Namespace mutagen của iztro CHỈ có bốn chữ một âm 禄权科忌 (xem terms.generated.ts),
+  // nên 化禄/化权/化科/化忌 không tồn tại ở bất kỳ bảng nào — trong khi ChartBoard.tsx:315-318
+  // in đúng bốn chuỗi hai âm đó làm chú giải màu. Không đổi component về một chữ: chú giải
+  // phải đọc 'Hóa Lộc' mới đúng thuật ngữ Việt, và '禄' một chữ là dạng badge trong ô cung.
+  { zh: '化禄', vi: 'Hóa Lộc', kind: 'mutagen',
+    note: "ChartBoard.tsx:315 (chú giải màu tứ hóa). Dạng đầy đủ của '禄'='Lộc' " +
+          "(mutagen một âm, đã có trong generated); thêm 化 để không nhầm với sao 禄存." },
+  { zh: '化权', vi: 'Hóa Quyền', kind: 'mutagen',
+    note: "ChartBoard.tsx:316. Dạng đầy đủ của '权'='Quyền' (mutagen một âm trong generated)." },
+  { zh: '化科', vi: 'Hóa Khoa', kind: 'mutagen',
+    note: "ChartBoard.tsx:317. Dạng đầy đủ của '科'='Khoa' (mutagen một âm trong generated)." },
+  { zh: '化忌', vi: 'Hóa Kỵ', kind: 'mutagen',
+    note: "ChartBoard.tsx:318. Dạng đầy đủ của '忌'='Kỵ' (mutagen một âm trong generated); " +
+          "progress Task 2 đo hasTerm('化忌')===false nên override là đường duy nhất." },
 
   // ── (a) thập nhị canh chố dưới dạng 时 ──
   // (sync đã sinh '子时'..'亥时' từ earthlyBranch; giữ override cho 早/晚 子时 vì

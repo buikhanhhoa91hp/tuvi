@@ -27,27 +27,36 @@ import { hasTerm } from '../../lib/i18n/resolve';
 const CJK = /[\u4e00-\u9fff]/;
 
 /** Danh sách file đã convert. Task 7/8/9 lần lượt thêm file của mình vào đây. */
-export const ADOPTED: string[] = ['app/chart/page.tsx'];
+export const ADOPTED: string[] = [
+  'app/chart/page.tsx',
+  'components/PalaceCell.tsx',
+  'components/ChartBoard.tsx',
+];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
  *  test sẽ âm thầm cho qua đúng thứ nó nên bắt. */
 const EXCLUDE = new Set<string>([
   // '《骨髓赋》', // ly do: ten tac pham, giu nguyen van
-  // R6 (Task 5, trước khi Task 7 khai báo PalaceCell vào ADOPTED):
-  // PalaceCell.tsx:117-120 render hai badge đơn tự '命' và '身' trong ô chữ 7px.
+  // R6 (khai ở Task 5, CÓ HIỆU LỰC từ Task 7 khi PalaceCell vào ADOPTED):
+  // PalaceCell.tsx:135 và :138 render hai badge đơn tự '命' và '身' trong ô 7px cạnh tên cung.
   // Dịch ra 'M'/'T' thì không đọc được, mà badge vốn chỉ trang trí (không mang dữ liệu),
-  // nên giữ nguyên Hán có chủ đích. Đây là hai literal đơn tự DUY NHẤT được miễn;
-  // mọi chuỗi dài hơn chứa hai chữ này (ví dụ '查看命盘') vẫn bị bắt như thường,
-  // vì EXCLUDE khớp từng chuỗi nguyên văn, không khớp theo mẫu.
-  '命', // ly do: badge 7px trang tri o PalaceCell.tsx:116 (R6) - giu nguyen van
-  '身', // ly do: badge 7px trang tri o PalaceCell.tsx:119 (R6) - giu nguyen van
-  // '限' và '年' (ChartBoard.tsx:75) KHÔNG cần ở đây: cả hai là THUẬT NGỮ trong
-  // terms.override.ts (đã kiểm chứng: hasTerm('限')=true → 'Hạn', hasTerm('年')=true →
-  // 'Lưu niên'). Nhung tu R28 con them mot dieu kien wiring nua: source :75 viet
-  // `timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年' : ''` roi duoc render
-  // qua <Bi mode="term"> o Task 7 → pass vi (a) nam trong mot loi dich + (b) co trong
-  // bang. Xoa <Bi> khoi call site HOAC xoa hai override do → ratchet lap tuc bao, dung
-  // chieu mong muon: khong con duong tat "chuoi nam trong bang la duoc tinh la convert".
+  // nên giữ nguyên Hán có chủ đích. Đây là hai literal DUY NHẤT được miễn và Task 7 đã đo
+  // chúng THỰC SỰ mang tải: xóa hai dòng dưới khỏi EXCLUDE thì ratchet báo ngay
+  // `components/PalaceCell.tsx:135: '命' → render TRAN` và :138 cho '身' (biên bản 2 chiều
+  // trong task-7-report.md). Mọi chuỗi dài hơn chứa hai chữ này (ví dụ '查看命盘') vẫn bị bắt
+  // như thường, vì EXCLUDE khớp từng chuỗi nguyên văn, không khớp theo mẫu.
+  '命', // ly do: badge 7px trang tri o PalaceCell.tsx:135 (R6) - giu nguyen van
+  '身', // ly do: badge 7px trang tri o PalaceCell.tsx:138 (R6) - giu nguyen van
+  // '限' và '年' KHÔNG cần ở đây: cả hai là THUẬT NGỮ trong terms.override.ts (đã kiểm chứng:
+  // hasTerm('限')=true → 'Hạn', hasTerm('年')=true → 'Niên'; R19 bỏ 'Lưu niên' hai âm vì đo
+  // trên /chart thấy nó làm badge overlay vỡ hàng phụ tinh). Từ Task 7, call site
+  // ChartBoard.tsx:81-85 dựng thẳng <Bi mode="term" zh="限"|"年"> nên (a) literal nằm TRONG một
+  // lời dịch và (b) có bản dịch. Xóa <Bi> ở call site HOẶC xóa override '年' → ratchet lập tức
+  // báo, đúng chiều mong muốn: không còn đường tắt "chuỗi nằm trong bảng là được tính là convert".
+  // Bốn key màu SIHUA_STYLES (PalaceCell.tsx:41-44) và bốn chuỗi chú giải
+  // 化禄/化权/化科/化忌 (ChartBoard.tsx:315-318) cũng KHÔNG ở đây: Task 7 viết chúng qua
+  // biTerm(..).zh — .zh là đồng nhất nên key/label vẫn là đúng ký tự Hán để so khớp với engine,
+  // còn literal thì nằm trong một lời dịch thay vì xin miễn trừ dù nó chẳng phải nhãn UI.
 ]);
 
 /**
@@ -55,16 +64,20 @@ const EXCLUDE = new Set<string>([
  * khai báo tường minh ở đây (đúng nguyên văn source) sau khi đã chuyển sang biFmt.
  * Không khai báo = vi phạm. Đây là cách bịt lỗ hổng "template lọt lưới ratchet".
  *
- * LUU Y cho Task 7 (R7): chuoi khai bao o day PHAI trung dung nguyen van cau ma
- * extractCjkLiterals bat duoc, tuc la giu ca ky tu `$` trong template literal cua source.
- * Hien tai ChartBoard.tsx:175 viet `{dx.startAge}–{dx.endAge}岁` duoi dang JSX text
- * (khong phai chuoi) nen extractor khong nhin thay gi ca — day la diem mu cua extractor,
- * khong phai "da duoc mien". Hai duong cho Task 7:
+ * LUU Y (R7) — ChartBoard.tsx tung viet `{dx.startAge}–{dx.endAge}岁` duoi dang JSX text
+ * chen bieu thuc nen extractor khong nhin thay gi ca (diem mu R29a, KHONG phai "da duoc mien").
+ * Hai duong cho Task 7:
  *  (a) goi biFmt('{n1}–{n2}岁', ...) = chuoi tran, khong co `$` → khong can TEMPLATE_OK,
  *      chi can them key '{n1}–{n2}岁' vao UI_FMT_VI (R7); hoac
  *  (b) giu source la template literal thi phai them dong
  *      '${dx.startAge}–${dx.endAge}岁'  (bat dau bang `$`) vao TEMPLATE_OK ben duoi.
  * Khai bao sai dang so voi source = van bi báo vi pham, khong lo.
+ *
+ * TASK 7 CHON DUONG (a): ChartBoard.tsx:211 viet
+ *   <Bi mode="fmt" template="{n1}–{n2}岁" args={{ n1: dx.startAge, n2: dx.endAge }} compact />
+ * nen literal '{n1}–{n2}岁' duoc extractCjkLiterals nhin thay, nam trong span <Bi> (R28 a) va
+ * co key trong UI_FMT_VI (R28 b). TEMPLATE_OK vi the VAN RONG — dung them dong nao vao day cho
+ * nui nay nua.
  *
  * R28 KHONG ap yeu cau "phai nam trong loi dich" cho nhanh template: template ${} khong
  * the tra bang theo key tran (R14 khop tuyet doi) nen duong (b) cua R7 van duoc mo, va
@@ -72,7 +85,7 @@ const EXCLUDE = new Set<string>([
  * tuong minh tung chuoi" nhu EXCLUDE, khong phai o han cua R28.
  */
 const TEMPLATE_OK = new Set<string>([
-  // '{dx.startAge}–{dx.endAge}岁', // ChartBoard.tsx:175 — đã về biFmt ở Task 7 Step 4
+  // Rat: Task 7 ve duong (a) (Bi mode="fmt" + key UI_FMT_VI) nen khong dong nao o day.
 ]);
 
 /**

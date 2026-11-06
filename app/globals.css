@@ -443,6 +443,26 @@ body {
 .bi { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.25; }
 .bi-vi { white-space: nowrap; }
 .bi-zh { font-size: 0.68em; opacity: 0.5; letter-spacing: 0.02em; white-space: nowrap; }
+/* Badge tứ hóa (PalaceCell) cao ~10px và nằm CẠNH tên sao: xếp cột như .bi mặc định thì
+   badge cao gấp đôi tên sao, gióng hỏng hàng trong ô 90px. Ở đây hai thành phần đặt ngang,
+   chữ Hán nhỏ hơn một chút cho rõ vai trò phụ chú. */
+.bi-badge { flex-direction: row; align-items: baseline; gap: 1px; }
+.bi-badge .bi-zh { font-size: 0.78em; }
+/* .bi-cell = các <Bi> trong 12 Ô CUNG (PalaceCell). .bi-vi nowrap (Task 6) làm min-content
+   của một cột lưới = cả cụm từ Việt dài nhất ('Thiên Tường', 'Lưu niên'…), nên dưới ~520px
+   ô cung không co nổi và CỘT 4 TRÀN RA NGOÀI lưới — mà lưới có overflow-hidden nên nó bị
+   CẮT MẤT (đo viewport 480px: 4×120.5 = 485px > lưới 443px, 4 ô biến mất; bản chữ Hán
+   không bị vì cellW chỉ 90px). Cho tên Việt xuống dòng trong ô thì hết cắt: chữ Hán đã ẩn
+   ở đây (.bi-compact) nên không thành đôi hàng, và min-width:0 cho flex item co dưới
+   min-content. Ngoài 640px giữ nowrap — không gian thừa, xuống dòng chỉ làm rối. */
+@media (max-width: 639px) {
+  .bi-cell { min-width: 0; }
+  .bi-cell .bi-vi, .bi-cell .bi-zh { white-space: normal; overflow-wrap: anywhere; }
+}
+/* Dưới 420px, badge overlay ('Niên'+'Khoa', flex-shrink-0) tràn ~4px qua sát ô cung bên
+   cạnh (đo viewport 360px, ô  Phu Thê). Cho hàng chính tinh xuống dòng thì badge nằm gọn
+   trong ô, không cắt chữ — ô đã cao tối thiểu 90px nên không vỡ lưới. */
+@media (max-width: 419px) { .star-row { flex-wrap: wrap; } }
 /* Ô lá số rất hẹp: ẩn bớt chữ Hán DƯỚI 640px để không tràn ô.
    639px chứ không phải 640px (R27): Tailwind `sm` là min-width:640px, nên max-width:640px
    làm viewport đúng 640px khớp CẢ HAI — chữ Hán bị ẩn ngay trên breakpoint desktop. */

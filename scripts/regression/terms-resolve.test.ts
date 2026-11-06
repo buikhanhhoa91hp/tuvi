@@ -73,5 +73,19 @@ ok(OVERRIDE_TERMS.every((e) => e.vi.trim() !== ''),
 ok(OVERRIDE_TERMS.every((e) => e.note.trim() !== ''),
    `moi override co note khong rong (rong: ${emptyNote.map((e) => e.zh).join(', ') || 'khong'})`);
 
+// 8. Task 7 — các giá trị mà KHÔNG gate nào khác bảo vệ:
+//    (a) 化禄/化权/化科/化忌 là DẠNG ĐẦY ĐỦ của tứ hóa, iztro mutagen chỉ có một âm nên
+//        sync không sinh ra; ChartBoard.tsx:315-318 render chúng qua <Bi mode="term">. Xóa
+//        override thì ratchet VẪN XANH (lời dịch biTerm được miễn điều kiện bảng — R28 (b)
+//        chỉ áp cho câu), và chart-name-coverage không quét tới (engine không phát sinh
+//        chuỗi 化X). Vì vậy giá trị phải chốt ở đây.
+for (const [zh, vi] of [['化禄', 'Hóa Lộc'], ['化权', 'Hóa Quyền'], ['化科', 'Hóa Khoa'], ['化忌', 'Hóa Kỵ']] as const) {
+  ok(viTerm(zh, 'mutagen') === vi, `dang day du tu hoa '${zh}' -> '${vi}'`);
+}
+//    (b) R19: nhãn overlay một âm, đối xứng Hạn/Niên — 'Lưu niên' hai âm từng làm vỡ hàng
+//        phụ tinh ở viewport 1280 (badge 68–83px trong ô 211px; đo 2026-11-06).
+ok(viTerm('限', 'misc') === 'Hạn', "R19: '限' -> 'Hạn' (mot am)");
+ok(viTerm('年', 'misc') === 'Niên', "R19: '年' -> 'Niên' (mot am, khong con 'Lưu niên')");
+
 console.log(failed ? `\n✗ terms-resolve: ${failed} loi` : '\n✅ terms-resolve: đạt');
 process.exit(failed ? 1 : 0);

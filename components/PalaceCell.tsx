@@ -1,8 +1,11 @@
 'use client';
 import { motion } from 'framer-motion';
+import type { ReactNode } from 'react';
 import type { Palace, Star } from '@/lib/ziwei/types';
 import { STEMS, BRANCHES } from '@/lib/ziwei/constants';
 import clsx from 'clsx';
+import Bi from './Bi';
+import { biTerm } from '@/lib/i18n/resolve';
 
 interface PalaceCellProps {
   palace: Palace;
@@ -13,17 +16,32 @@ interface PalaceCellProps {
   delay?: number;
   /** 叠加四化：星名 → 四化类型（'禄'/'权'/'科'/'忌'） */
   overlayStarSiHua?: Record<string, string>;
-  /** 叠加标签：'年'（流年）或 '限'（大限） */
-  overlayLabel?: string;
+  /**
+   * Nhãn overlay ('限' đại hạn / '年' lưu niên). Ở đây nó là NODE ĐÃ DỊCH chứ không phải
+   * chuỗi Hán: ChartBoard dựng bằng <Bi mode="term"> nên R28 thấy literal nằm trong lời
+   * dịch, và cung không bao giờ so sánh nhãn này với dữ liệu engine (chỉ in).
+   */
+  overlayLabel?: ReactNode;
   /** 点击叠加四化 badge 回调 */
   onSiHuaClick?: (starName: string, siHua: string) => void;
 }
 
+/**
+ * Bảng màu badge tứ hóa. KEY là ký tự Hán engine trả ra (`Star.siHua`, types.ts:39) nên
+ * phép so khớp phải giữ nguyên chữ Hán — dịch key ra là mất màu.
+ *
+ * Key viết qua `biTerm(..).zh` thay vì chuỗi Hán trần, vì PalaceCell nằm trong ADOPTED của
+ * ratchet (R28) và ratchet đo theo VỊ TRÍ chuỗi, không biết "đây là dữ liệu chứ không phải
+ * nhãn UI". `biTerm().zh` là đồng nhất (thiếu bản dịch thì viTerm trả undefined, biTerm trả
+ * { zh } nguyên văn — xem resolve.ts:26-29) nên key KHÔNG bao giờ đổi; đồng thời nó khai báo
+ * "bốn chuỗi này là THUẬT NGỮ mutagen", đúng loại, thay vì xin miễn trừ trong EXCLUDE.
+ * Xóa lời gọi biTerm ở đây → ratchet báo ngay (chứng minh ở task-7-report.md).
+ */
 const SIHUA_STYLES: Record<string, string> = {
-  '禄': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
-  '权': 'text-blue-400 bg-blue-500/10 border-blue-500/30',
-  '科': 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30',
-  '忌': 'text-red-400 bg-red-500/10 border-red-500/30',
+  [biTerm('禄', 'mutagen').zh]: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+  [biTerm('权', 'mutagen').zh]: 'text-blue-400 bg-blue-500/10 border-blue-500/30',
+  [biTerm('科', 'mutagen').zh]: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30',
+  [biTerm('忌', 'mutagen').zh]: 'text-red-400 bg-red-500/10 border-red-500/30',
 };
 
 const SiHuaBadge = ({
@@ -34,7 +52,7 @@ const SiHuaBadge = ({
 }: {
   siHua: string;
   overlay?: boolean;
-  label?: string;
+  label?: ReactNode;
   onClick?: (e: React.MouseEvent) => void;
 }) => {
   return (
@@ -48,7 +66,8 @@ const SiHuaBadge = ({
       onClick={onClick}
     >
       {overlay && label && <span className="mr-px opacity-70">{label}</span>}
-      {siHua}
+      {/* siHua vẫn là ký tự Hán (key engine); <Bi> chỉ in thêm bản Việt bên cạnh. */}
+      <Bi mode="term" zh={siHua} kind="mutagen" className="bi-badge" compact />
     </span>
   );
 };
@@ -110,7 +129,7 @@ export default function PalaceCell({
         )}
           style={!isMingGong && !isShenGong ? { color: 'var(--t-faint)' } : undefined}
         >
-          {name}
+          <Bi mode="term" zh={name} kind="palace" className="bi-cell" compact />
         </span>
         {isMingGong && (
           <span className="text-[7px] text-amber-500/80 border border-amber-500/30 px-0.5 rounded leading-tight">命</span>
@@ -126,21 +145,24 @@ export default function PalaceCell({
       {/* 主星 */}
       <div className="flex flex-col gap-0.5 flex-1">
         {majorStars.length === 0 && (
-          <span className="text-[10px] italic" style={{ color: 'var(--t-faint)', opacity: 0.6 }}>空宫</span>
+          <span className="text-[10px] italic" style={{ color: 'var(--t-faint)', opacity: 0.6 }}>
+            <Bi mode="text" zh="空宫" className="bi-cell" compact />
+          </span>
         )}
         {majorStars.map((star) => {
           const overlaySiHua = overlayStarSiHua?.[star.name];
           return (
             <div
               key={star.name}
-              className="flex items-center"
+              className="star-row flex items-center"
               onClick={e => { e.stopPropagation(); onStarClick?.(star); }}
             >
               <span className={clsx(
                 'text-[13px] leading-tight font-bold tracking-tight cursor-pointer hover:brightness-125 transition-all',
                 star.brightness === 'bright' ? 'text-amber-300' : star.brightness === 'dim' ? 'text-amber-700/80' : 'text-amber-500',
               )}>
-                {star.name}
+                {/* key={star.name} và mọi so sánh bên dưới vẫn dùng star.name gốc Hán. */}
+                <Bi mode="term" zh={star.name} kind="star" className="bi-cell" compact />
               </span>
               {star.siHua && <SiHuaBadge siHua={star.siHua} />}
               {overlaySiHua && (
@@ -166,7 +188,7 @@ export default function PalaceCell({
             const overlaySiHua = overlayStarSiHua?.[s.name];
             return (
               <span key={s.name} className="inline-flex items-center text-[9px] text-sky-500/70 leading-tight">
-                {s.name}
+                <Bi mode="term" zh={s.name} kind="star" className="bi-cell" compact />
                 {s.siHua && <SiHuaBadge siHua={s.siHua} />}
                 {overlaySiHua && (
                   <SiHuaBadge
@@ -190,7 +212,7 @@ export default function PalaceCell({
         <div className="flex flex-wrap gap-x-1">
           {shaStars.map(s => (
             <span key={s.name} className="text-[9px] text-red-500/60 leading-tight">
-              {s.name}{s.siHua && <SiHuaBadge siHua={s.siHua} />}
+              <Bi mode="term" zh={s.name} kind="star" className="bi-cell" compact />{s.siHua && <SiHuaBadge siHua={s.siHua} />}
             </span>
           ))}
         </div>
