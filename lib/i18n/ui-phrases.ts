@@ -4,8 +4,8 @@
  * vì UI hiển thị thuật ngữ qua <Bi mode="term"> chứ không qua bảng này.
  *
  * Charter (R12): một chữ Hán đứng một mình mà đã là THUẬT NGỮ thì KHÔNG được vào đây.
- * '限' vì vậy không có mục nào — nó thuộc terms.override.ts, render qua biTerm('限').
- * scripts/regression/ui-phrases.test.ts guard điều đó bằng
+ * '限' và '年' vì vậy không có mục nào — cả hai thuộc terms.override.ts, render qua
+ * biTerm (R15). scripts/regression/ui-phrases.test.ts guard điều đó bằng
  * `Object.keys(UI_VI).every(k => !hasTerm(k))`.
  *
  * Mọi key ở dưới đã đối chiếu từng ký tự với source (kể cả （） ： – ， ； dấu cách);
@@ -31,8 +31,10 @@ export const UI_VI: Record<string, string> = {
   '紫微斗数命盘': 'Lá số Tử Vi',                                   // :111
   '紫微斗数': 'Tử Vi đẩu số',                                       // :161
   '当前大限': 'Đại hạn hiện tại',                                    // :174
-  // '限' KHÔNG ở đây — thuật ngữ, xem charter ở đầu file (R12).
-  '年': 'Lưu niên',                                                 // :75 overlayLabel (badge lưu niên)
+  // :75 `timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年'` — cả hai nhãn của
+  // cùng một biểu thức đều là THUẬT NGỮ, nên ở terms.override.ts (R12 + R15), không ở đây.
+  // '闰' thì khác: đó là tiếp đầu tố 'tháng nhuận' của lịch âm (:182), không phải thuật ngữ;
+  // ngày nào nó thành thuật ngữ thì guard `UI_VI ∩ hasTerm = ∅` phải báo — guard đang làm việc.
   '闰': 'nhuận',                                                    // :182
 
   // ── app/chart/page.tsx ──
@@ -48,17 +50,21 @@ export const UI_VI: Record<string, string> = {
  * Câu có nội suy. Placeholder BẮT BUỘC có tên, không dùng vị trí, vì trật tự từ
  * Việt khác Hán (ví dụ 1990年6月15日 → 15/06/1990, đảo cả ba thành phần).
  *
- * Quy ước key: nguồn viết `${y}年${m}月${d}日` (template literal) hoặc `{mo} 月`
- * (JSX expression) — ở đây ghi lại đúng nguyên văn nhưng đổi phần nội suy thành
- * `{tên}`. Call site truyền chính chuỗi key đó cho biFmt(); resolve.ts còn khớp
- * được khi call site đặt tên placeholder khác (xem ghi chú ở biFmt).
+ * Quy ước key: nguồn viết `${y}年${m}月${d}日` (template literal) hoặc
+ * `<option>{mo} 月</option>` (JSX) — ở đây ghi lại đúng nguyên văn nhưng đổi phần nội
+ * suy thành `{tên}`. Từ R14, biFmt/hasPhrase chỉ khớp key TUYỆT ĐỐI: call site phải
+ * truyền đúng chuỗi key, kể cả tên placeholder (`{m}`, không phải `{mo}`); truyền khác
+ * tên thì missing=true và ratchet Task 5 phải thấy — đó là hành vi muốn có, không phải
+ * chỗ để nới.
  *
- * Quy ước value: `{name:N}` = padStart(N, '0'). Chỉ dùng cho vế Việt, vì vế Hán
- * phải tái hiện đúng chuỗi app đã in ra. Task 8 có thể truyền sẵn chuỗi đã pad
- * (`String(m).padStart(2,'0')`) — pad khi đó là no-op, không ảnh hưởng.
+ * Quy ước value: chỉ thế `{name}` bằng args[name]; không còn cú pháp định dạng nào
+ * (kiểu `{name:N}` đã bỏ theo R14). Muốn số lẻ có '0' đầu thì call site pad sẵn trước
+ * khi gọi — xem plans Task 8 Step 3: `biFmt('{y}年{m}月{d}日', { y,
+ * m: String(m).padStart(2,'0'), d: String(d).padStart(2,'0') })`. Vế Hán luôn tái hiện
+ * đúng chuỗi app đã in.
  */
 export const UI_FMT_VI: Record<string, string> = {
-  '{y}年{m}月{d}日': '{d:2}/{m:2}/{y}',               // BirthForm.tsx:115
+  '{y}年{m}月{d}日': '{d}/{m}/{y}',                   // BirthForm.tsx:115 (call site pad: '15/06/1990')
   '{m}月没有{d}日': 'Ngày {d} không có trong tháng {m}', // BirthForm.tsx:97 (không pad: 'tháng 2', không phải 'tháng 02')
   '{m} 月': 'Tháng {m}',                               // BirthForm.tsx:263 `<option>{mo} 月</option>` (dấu cách U+0020 trước 月)
   '{n}岁': '{n} tuổi',                                 // chưa có source trần nào; ChartBoard.tsx:175 là `{dx.startAge}–{dx.endAge}岁` — Task 7 khai báo key '{n1}–{n2}岁' riêng (R7)

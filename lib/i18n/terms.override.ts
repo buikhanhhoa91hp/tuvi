@@ -32,6 +32,16 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
   { zh: '限', vi: 'Hạn', kind: 'misc',
     note: "iztro zh-CN/common.json decadal='大限' → vi-VN 'Đại Hạn' — 限 đứng một đoạn là 'Hạn' " +
           "(đại hạn/lưu hạn). Không sinh ra từ sync (R5 loại common.json) nên override là đường duy nhất." },
+  // R15: '限' và '年' là hai nhãn của CÙNG một biểu thức ở ChartBoard.tsx:75
+  // (`timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年'`). Một chữ ở
+  // terms.override, chữ kia ở UI_VI là phá quy tắc một nguồn — guard
+  // `UI_VI ∩ hasTerm = ∅` sẽ fail đúng vào ngày '年' được khai là thuật ngữ. Nên '年'
+  // về đây, đứng cạnh '限'; '闰' (nhãn tháng nhuận, :182) thì ở lại UI_VI.
+  { zh: '年', vi: 'Lưu niên', kind: 'misc',
+    note: "Nhãn temporal ghép cặp với '限' trong overlayLabel của ChartBoard.tsx:75 (chế độ xem " +
+          "lưu niên). iztro zh-CN/common.json yearly='流年' → vi-VN 'Lưu Niên', nên bản Việt " +
+          "chuẩn của '年' ở ngữ cảnh này là 'Lưu niên'. common.json bị R5 loại khỏi sync nên " +
+          "generated không có mục này — override là đường duy nhất (R15)." },
 
   // ── (a) thập nhị canh chố dưới dạng 时 ──
   // (sync đã sinh '子时'..'亥时' từ earthlyBranch; giữ override cho 早/晚 子时 vì
