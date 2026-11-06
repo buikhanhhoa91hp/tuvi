@@ -5,7 +5,11 @@
 /* ─── 2.0 设计系统 Token ─────────────────────────────────── */
 :root {
   /* 字体 */
-  --font: -apple-system, 'PingFang SC', 'Helvetica Neue', 'Segoe UI', sans-serif;
+  /* Latin font đứng TRƯỚC để tiếng Việt dùng Segoe UI/PingFang (có dấu đầy đủ);
+     CJK chỉ được dùng khi glyph Latin không tồn tại. Nếu để PingFang đứng đầu,
+     trên Windows nó không tồn tại nên mọi thứ rơi về Segoe UI, còn trên iOS
+     PingFang render dấu Việt kém hơn system font. */
+  --font: -apple-system, 'Segoe UI', 'Helvetica Neue', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   --font-mono: 'SF Mono', 'Menlo', 'Noto Sans Mono', 'Consolas', monospace;
 
   /* 背景层级 */
@@ -434,3 +438,10 @@ body {
    select 本身是半透明底 + 浅色字，Windows 上原生下拉列表是白底，浅灰字配白底看不清（#14） */
 [data-theme="dark"] select { color-scheme: dark; }
 [data-theme="dark"] select option { background-color: var(--bg-2); color: var(--tx-1); }
+
+/* ─── Song ngữ Trung–Việt: Việt là chính, Hán là phụ ─────────────────── */
+.bi { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.25; }
+.bi-vi { white-space: nowrap; }
+.bi-zh { font-size: 0.68em; opacity: 0.5; letter-spacing: 0.02em; white-space: nowrap; }
+/* Ô lá số rất hẹp: ẩn bớt chữ Hán dưới 640px để không tràn ô */
+@media (max-width: 640px) { .bi-compact .bi-zh { display: none; } }
