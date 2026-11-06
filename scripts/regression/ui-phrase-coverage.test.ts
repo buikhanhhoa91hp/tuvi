@@ -42,6 +42,14 @@ export const ADOPTED: string[] = [
   // Task c2: trang kien thuc (SEO Knowledge pages)
   'app/knowledge/page.tsx',
   'app/knowledge/[star]/[topic]/page.tsx',
+  // Task c3: trang thu vien co tich /library (chrome dich sang tieng Viet; VAN BAN
+  // co tich trong lib/classics/data/* la DATA, khong phai chrome -> khong file nao
+  // trong lib/classics/ duoc them vao ADOPTED).
+  'app/library/page.tsx',
+  'app/library/LibrarySearch.tsx',
+  'app/library/search/page.tsx',
+  'app/library/[book]/page.tsx',
+  'app/library/[book]/[chapter]/page.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
@@ -107,6 +115,20 @@ const EXCLUDE = new Set<string>([
   '紫微研究 · 倪海厦正宗', // ly do: JSON-LD author.name, giu nguyen van
   '紫微研究',        // ly do: JSON-LD publisher.name, giu nguyen van
   '紫微斗数 · 倪海厦体系', // ly do: JSON-LD articleSection, giu nguyen van
+
+  // R30-dot-Task-c3 — /library (thu vien co thu). HAI NHOM mien, deu co chu dich that
+  // o UI_VI cho cac chuoi khac; day chi la phan GIU NGUYEN VAN co y thuc:
+  // (1) metadata SEO cua 3 page — phan quyet e0e2140 (title/description khong doi khi
+  //     doi ngon ngu hien thi; chung la tu khoa tim kiem nguoi dung goi bang tieng Trung);
+  // (2) duong dan vi du tu khoa tren trang ket qua — day la CHUOI GOI cho searchClassics
+  //     (matching tren ngu lieu co tich viet bang chu Hán), dich sang tieng Viet thi
+  //     nguoi dung nhan noi dung goi ma khong tim thay gi → khong phai nhan UI dich duoc.
+  // LUU Y nhu 12 dia chi o tren: EXCLUDE khop toan cuc theo nguyen van, nen mot file
+  // ADOPTED tuong lai in tran cung chuoi do cung lot luoi — bat case do bang render test.
+  '倪师方法论 · 古籍原典库 · 紫微斗数全集 / 全书 / 骨髓赋', // ly do: metadata title /library, giu nguyen van
+  '紫微斗数权威古籍全文检索：《紫微斗数全集》《紫微斗数全书》《骨髓赋》倪海厦《天纪》引证来源', // ly do: metadata description /library
+  '搜索 · 古籍原典库', // ly do: metadata title /library/search
+  '七杀朝斗 / 双禄朝垣 / 化忌 / 紫微 / 命宫 / 机月同梁', // ly do: chuoi goi thu cho may tim kiem ngu lieu Hán (search/page.tsx empty state)
 ]);
 
 /**
@@ -144,6 +166,14 @@ const TEMPLATE_OK = new Set<string>([
   '${star}入${data.palaceName}',           // :64 metadata keywords
   '紫微斗数 ${star}',                       // :65 metadata keywords
   '${star}入${data.palaceName}宫 · ${data.topicLabel}', // :86 JSON-LD headline
+
+  // Task c3 — /library: template literal trong generateMetadata (SEO giu nguyen van,
+  // phan quyet e0e2140). Phan ${...} la ten sach/ten chi/trieu dai — DATA tu
+  // lib/classics/data/*, khong phai chrome; khai bao tuong minh tung nguyen van source
+  // theo co che R7 duong (b).
+  '《${book.title}》· ${book.dynasty} · 紫微斗数古籍原典库', // app/library/[book]/page.tsx metadata title
+  '${result.chapter.title} · 《${result.book.title}》· 紫微斗数古籍', // app/library/[book]/[chapter]/page.tsx metadata title
+  '《${result.book.title}》${result.chapter.title}原文', // :21 metadata description (van ban co tich, khong dich)
 ]);
 
 /**

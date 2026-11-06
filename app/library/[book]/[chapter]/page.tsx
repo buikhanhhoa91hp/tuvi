@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ALL_BOOKS, getChapter } from '@/lib/classics';
+import { biFmt, biText } from '@/lib/i18n/resolve';
 
 export async function generateStaticParams() {
   return ALL_BOOKS.flatMap(b =>
@@ -12,6 +13,9 @@ export async function generateStaticParams() {
   );
 }
 
+// Metadata SEO giu nguyen tieng Trung (phan quyet commit e0e2140): hai template duoi
+// day noi title/description bang ten co thu + ten chi (DATA tu lib/classics/data/*)
+// → khai bao tuong minh trong TEMPLATE_OK cua ratchet, khong dich.
 export async function generateMetadata({ params }: { params: Promise<{ book: string; chapter: string }> }) {
   const { book: bookSlug, chapter: chIdx } = await params;
   const result = getChapter(bookSlug, parseInt(chIdx));
@@ -36,13 +40,13 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
       <div className="px-6 py-4 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
         <Link href={`/library/${book.slug}`} style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 《{book.title}》目录
+          {biFmt('← 《{bt}》目录', { bt: book.title }).vi}
         </Link>
         <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.15em' }}>
           {chapter.title}
         </div>
         <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          古籍库 →
+          {biText('古籍库 →').vi}
         </Link>
       </div>
 
@@ -111,7 +115,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   color: 'var(--tx-2)',
                   lineHeight: 1.8,
                 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--ac)', marginRight: '6px' }}>白话</span>
+                  <span style={{ fontSize: '10px', color: 'var(--ac)', marginRight: '6px' }}>{biText('白话').vi}</span>
                   {p.translation}
                 </div>
               )}
@@ -126,7 +130,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                   color: 'var(--tx-2)',
                   lineHeight: 1.8,
                 }}>
-                  <span style={{ fontSize: '10px', color: 'var(--ji)', marginRight: '6px' }}>倪师注</span>
+                  <span style={{ fontSize: '10px', color: 'var(--ji)', marginRight: '6px' }}>{biText('倪师注').vi}</span>
                   {p.niNote}
                 </div>
               )}
@@ -149,7 +153,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                 color: 'var(--tx-0)',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>← 上一章</div>
+              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>{biText('← 上一章').vi}</div>
               <div style={{ fontSize: '13px', fontWeight: 500 }}>{book.chapters[prevIdx].title}</div>
             </Link>
           ) : <div style={{ flex: 1 }} />}
@@ -167,7 +171,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ book: 
                 textAlign: 'right',
               }}
             >
-              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>下一章 →</div>
+              <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.2em', marginBottom: '2px' }}>{biText('下一章 →').vi}</div>
               <div style={{ fontSize: '13px', fontWeight: 500 }}>{book.chapters[nextIdx].title}</div>
             </Link>
           ) : <div style={{ flex: 1 }} />}

@@ -473,6 +473,63 @@ export const UI_VI: Record<string, string> = {
     'Thất Sát là Tướng tinh, chủ cô độc quả quyết mạo hiểm, hóa khí là túc sát. Người tọa Mệnh cương nghị quả quyết, hợp quân cảnh và khởi nghiệp.',
   '破军为破坏创新星，主六亲缘薄，化气为耗。落命主开创变动、宜技术专长。':
     'Phá Quân là sao phá cũ lập mới, chủ duyên với lục thân mỏng, hóa khí là hao. Người tọa Mệnh khai sáng nhiều biến động, hợp kỹ thuật chuyên môn.',
+
+  // ══ app/library/* (task c3) — chrome cua trang thu vien co thu ═══════
+  // R30: nhan/trang tri TIENG VIET THAY THE chuoi Hán qua biText(...).vi (khong dung
+  // <Bi mode="text"> — no in kem mot dong Hán). CHUOI NOI SUY → UI_FMT_VI + biFmt.
+  // NGOAI LE CO Y THUC (khong them vao bang, mien EXCLUDE/TEMPLATE_OK ben ratchet):
+  //  (1) metadata title/description cua 3 page — SEO giu nguyen van (e0e2140);
+  //  (2) VAN BAN co tich + ten sach/trieu dai/tac gia/ten chi tu lib/classics/data/*.
+  // Day la DATA, khong phai chrome: dich ra thi ban dich am tham tro thanh uy quyen
+  // thay the nguyen tac, nen giu nguyen (slot cho chu thich tieng Viet tuong lai =
+  // Paragraph.translation, da render san o app/library/[book]/[chapter]/page.tsx).
+
+  // ── dieu huong (dùng chung /library, /library/search, /library/[book], /[chapter]) ──
+  '← 返回首页': '← Về trang chủ',
+  '← 古籍库': '← Kho cổ thư',
+  '古籍库 →': 'Kho cổ thư →',
+  '首页 →': 'Trang chủ →',
+  '古籍原典库 · CLASSICS': 'Kho cổ thư nguyên bản · CLASSICS',
+  '搜索结果': 'Kết quả tìm kiếm',
+
+  // ── app/library/page.tsx — hero, the sach, khoi "ve kho" ──
+  '倪师方法论 · 古籍原典库': 'Phương pháp Ni sư · Kho cổ thư nguyên bản',
+  '紫微斗数权威古籍全文检索': 'Tìm kiếm toàn văn cổ thư Tử Vi đẩu số',
+  '收录': 'Bao gồm',
+  '部古籍 · 共': ' bộ cổ thư · tổng cộng',
+  '段精华': ' đoạn tinh hoa',
+  '进入查阅 →': 'Xem nguyên bản →',
+  '关于本库': 'Giới thiệu kho này',
+  '所收录古籍均为公版（明代刊本）。':
+    'Toàn bộ cổ thư trong kho đều thuộc phạm vi công cộng (bản khắc đời Minh).',
+  '内容持续完善，未来将补全《紫微斗数全集》全本与倪海厦《天纪》引证目录。':
+    'Nội dung đang tiếp tục được hoàn thiện; sắp tới sẽ bổ sung toàn bản Tử Vi Đẩu Số Toàn Tập và mục lục dẫn chứng Thiên Kỷ của thầy Ni Hải Hạ.',
+  '如发现任何错误请联系我们。': 'Nếu phát hiện sai sót, xin liên hệ với chúng tôi.',
+
+  // ── app/library/LibrarySearch.tsx — o tim kiem (client component) ──
+  // Vi du tu khoa trong placeholder giu NGUYEN VAN Hán: chung la chuoi goi cho
+  // searchClassics (matching tren ngu lieu Hán), dich ra thi goi khong ra ket qua.
+  '搜索古籍原文，如：七杀朝斗 / 双禄朝垣 / 化忌':
+    'Tìm trong nguyên bản cổ thư, ví dụ: 七杀朝斗 / 双禄朝垣 / 化忌',
+  '搜索': 'Tìm',
+
+  // ── app/library/search/page.tsx — trang ket qua + empty state ──
+  '搜索关键词': 'Từ khóa tìm kiếm',
+  '（空）': '(để trống)',
+  '共找到': 'Tìm thấy',
+  '条古籍原文匹配': ' đoạn cổ văn khớp',
+  '暂未在已收录古籍中找到这个关键词': 'Chưa tìm thấy từ khóa này trong kho cổ thư hiện có.',
+  '我们持续补充内容中。可尝试搜索：': 'Chúng tôi đang tiếp tục bổ sung nội dung. Có thể thử tìm:',
+  '请输入要搜索的关键词': 'Vui lòng nhập từ khóa cần tìm',
+
+  // ── app/library/[book]/page.tsx — tieu de khoi muc luc ──
+  'CHAPTERS · 章节目录': 'CHAPTERS · Mục lục chương',
+
+  // ── app/library/[book]/[chapter]/page.tsx — nhan chu thich + dieu huong chi ──
+  '白话': 'Bản dịch',
+  '倪师注': 'Chú của Ni sư',
+  '← 上一章': '← Chương trước',
+  '下一章 →': 'Chương sau →',
 };
 
 /**
@@ -528,4 +585,15 @@ export const UI_FMT_VI: Record<string, string> = {
   '想看你自己命盘的{tl}？': 'Muốn xem {tv} trên chính lá số của bạn?', // [topic]/page.tsx CTA
   '{sz}星的其他宫位解读': 'Luận giải các cung khác của sao {sv}',       // [topic]/page.tsx Section
   '其他主星入{pz}宫的解读': 'Luận giải các chính tinh khác nhập cung {pv}', // [topic]/page.tsx Section
+
+  // ── app/library/* (task c3) — chuoi dem so luong + dieu huong co ten sach ──
+  // Ba key '{n} …' co nguon la JSX `{expr} 章节` / `{expr} 段` — dang chen bieu thuc nen
+  // extractor KHONG nhin thay (R29a blind spot); goi biFmt voi chuoi tran ben trong loi
+  // dich lam no visible, dong thoi dich duoc ca nhan to so luong.
+  '{n} 章节': '{n} chương',                            // app/library/page.tsx the co thu
+  '{n} 段精华': '{n} đoạn tinh hoa',                   // app/library/page.tsx the co thu
+  '{n} 段': '{n} đoạn',                                // app/library/[book]/page.tsx muc luc chi
+  // {bt} = book.title — DATA tu lib/classics/data/* nen ca hai vế giữ《…》nguyên văn;
+  // chi '目录' la chrome → 'Mục lục'.
+  '← 《{bt}》目录': '← Mục lục《{bt}》',                // app/library/[book]/[chapter]/page.tsx dieu huong
 };
