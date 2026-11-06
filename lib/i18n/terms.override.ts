@@ -46,7 +46,8 @@ export const OVERRIDE_TERMS: OverrideEntry[] = [
           "override là đường duy nhất đưa mục này vào bảng." },
 ];
 
-/** Tra theo kind: chỉ mục cùng kind mới được xét tới. */
+/** kind là ƯU TIÊN giữa các mục cùng zh, không phải bộ lọc: không mục nào khớp kind
+ *  thì resolve.ts lấy mục đầu được khai báo (theo thứ tự viết trong bảng) — sai kind không mất bản dịch. */
 export const OVERRIDE_BY_ZH = new Map<string, OverrideEntry[]>();
 for (const e of OVERRIDE_TERMS) {
   const list = OVERRIDE_BY_ZH.get(e.zh);
