@@ -1,6 +1,6 @@
 import { viTerm, biTerm, hasTerm, viPillar } from '../../lib/i18n/resolve';
 import { GENERATED_TERMS } from '../../lib/i18n/terms.generated';
-import { OVERRIDE_TERMS, pickOverride } from '../../lib/i18n/terms.override';
+import { OVERRIDE_TERMS, OVERRIDE_BY_ZH, pickOverride } from '../../lib/i18n/terms.override';
 import type { OverrideEntry } from '../../lib/i18n/terms.types';
 
 let failed = 0;
@@ -91,6 +91,20 @@ for (const [zh, vi] of [['化禄', 'Hóa Lộc'], ['化权', 'Hóa Quyền'], ['
 //        phụ tinh ở viewport 1280 (badge 68–83px trong ô 211px; đo 2026-11-06).
 ok(viTerm('限', 'misc') === 'Hạn', "R19: '限' -> 'Hạn' (mot am)");
 ok(viTerm('年', 'misc') === 'Niên', "R19: '年' -> 'Niên' (mot am, khong con 'Lưu niên')");
+
+// 9. R-final (fix wave): buoc nho lai sau khi cat hau to 宫/星 phai di qua dung
+//    thu tu uu tien override -> generated nhu duong chinh. Truoc fix, resolve.ts chi
+//    hoi GENERATED_TERMS o buoc nay, nen override keyed tren dang cat ('试错') bi
+//    generated dang day du ('试错星') an mat — mat uu tien cua override (header
+//    terms.override.ts: "Quyết định của ta, thắng GENERATED_TERMS").
+//    Fixture tach, xoa ngay sau do — khong ship lan sang allTermsZh() (bao Task 10).
+GENERATED_TERMS['试错星'] = 'Thuat Sinh (generated)';
+OVERRIDE_BY_ZH.set('试错', [{ zh: '试错', vi: 'Thuat Sinh (override)', kind: 'misc',
+  note: 'fixture cuoc thu — xoa ngay ben duoi' }]);
+ok(viTerm('试错星') === 'Thuat Sinh (override)',
+   "buoc thu sau khi cat hau to: override dang cat ('试错') thang generated dang day du ('试错星')");
+delete GENERATED_TERMS['试错星'];
+OVERRIDE_BY_ZH.delete('试错');
 
 console.log(failed ? `\n✗ terms-resolve: ${failed} loi` : '\n✅ terms-resolve: đạt');
 process.exit(failed ? 1 : 0);

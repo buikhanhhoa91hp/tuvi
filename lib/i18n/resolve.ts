@@ -12,10 +12,18 @@ export function viTerm(zh: string, kind?: TermKind): string | undefined {
   if (!zh) return undefined;
   const chosen = pickOverride(OVERRIDE_BY_ZH.get(zh) ?? [], kind);
   if (chosen && chosen.vi) return chosen.vi;
+  // Cắt hậu tố 宫/星 rồi thử lại: '兄弟宫' → '兄弟', '火星' vẫn ra 'Hỏa Tinh'.
+  // (R-final) Thử lại PHẢI đi theo đúng thứ tự ưu tiên của đường chính — override trước,
+  // generated sau — nếu chỉ hỏi GENERATED_TERMS thì một override keyed trên dạng cắt
+  // ('测试') sẽ âm thầm thua một mục generated keyed trên dạng đầy đủ ('测试星').
+  // Hàm vẫn pure: chỉ đọc hai bảng, không state.
+  const stripped = zh.length > 1 ? zh.replace(/[宫星]$/, '') : undefined;
+  if (stripped && stripped !== zh) {
+    const o = pickOverride(OVERRIDE_BY_ZH.get(stripped) ?? [], kind);
+    if (o && o.vi) return o.vi;
+  }
   const gen = GENERATED_TERMS[zh];
   if (gen) return gen;
-  // Cắt hậu tố 宫/星 rồi thử lại: '兄弟宫' → '兄弟', '火星' vẫn ra 'Hỏa Tinh'
-  const stripped = zh.length > 1 ? zh.replace(/[宫星]$/, '') : undefined;
   if (stripped && stripped !== zh) {
     const g = GENERATED_TERMS[stripped];
     if (g) return g;
