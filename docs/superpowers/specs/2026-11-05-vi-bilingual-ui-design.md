@@ -46,11 +46,12 @@ Tất cả các mục dưới đây đã đọc/đo trực tiếp, không phải
    Số dòng chứa chữ Hán (đã trừ dòng chỉ có comment):
 
    | Khu vực | Dòng CJK | Là comment | Cần dịch |
+| Corpus Ni Hải Hạ | Dịch, nhưng chỉ trong khu nghiên cứu miễn phí. Không khẩn cấp: `lib/nihai/` hiện không được render ở đâu (mục 6). |
    |---|---|---|---|
    | `app/` | 501 | 73 | ~428 |
    | `components/` | 609 | 93 | ~516 |
    | `lib/ziwei/` | 2316 | — | thuật ngữ + bảng sáng độ + văn 格局 |
-   | `lib/nihai/` | 1027 | — | corpus sách (đợt C) |
+   | `lib/nihai/` | 1027 | — | corpus sách — **không được render ở đâu cả**, xem mục 6 |
    | `lib/classics/` | 169 | — | kinh văn cổ — **không dịch** |
    | `lib/seo/` | 41 | — | metadata |
    | `scripts/` | 298 | — | test, giữ nguyên |
@@ -222,18 +223,105 @@ không chỉ dựa vào lý thuyết.
 
 - `app/page.tsx` (1191) và `lib/seo` (41): Việt là chính cho title/description; metadata
   `locale` → `vi_VN`.
-- `lib/nihai/` (1027): dịch corpus kèm nguyên văn trong `<details>`.
-- `lib/classics/` (169): **giữ nguyên văn kinh văn, chỉ thêm chú giải Việt.** Lý do: đây là tư
-  liệu gốc (`《骨髓赋》`…), dịch ra là mất khả năng đối chiếu và dễ sai ý; người xem lá số cần
-  tra được bản gốc.
+- `lib/classics/` (169): **giữ nguyên văn kinh văn, chỉ thêm chú giải Việt** vào field
+  `translation` đã có sẵn (mục 5). Lý do: đây là tư liệu gốc (`《骨髓赋》`…), dịch ra là mất
+  khả năng đối chiếu và dễ sai ý; người xem lá số cần tra được bản gốc.
 - `app/heming/page.tsx` (369, hợp bàn) dùng lại toàn bộ bảng thuật ngữ của đợt A.
+- **`lib/nihai/` (1207 dòng) — KHÔNG dịch, và đây là chỗ tôi tự sửa spec của mình.**
+  `grep -rln nihai` trên toàn repo (trừ chính thư mục đó và `node_modules`) trả về **rỗng**:
+  corpus này không được `app/**` hay `components/**` import ở bất kỳ đâu. Đó là dữ liệu chết
+  trong bản open-source. Dịch 1207 dòng không render ra màn hình nào là lãng phí, và cũng không
+  giảm rủi ro gì vì nó vốn không đến với khách. Xem mục 6 để biết hệ quả với quyết định đã chọn.
 
-## 5. Kiểm thử và chốt an toàn
+## 5. Thêm sách Tử Vi mới về sau (đã có sẵn chỗ, không phải code)
+
+Người dùng hỏi về khả năng nạp thêm sách sau này. Đã đọc cấu trúc thật và câu trả lời là
+**kiến trúc hiện tại đã thiết kế sẵn cho việc này**, cụ thể:
+
+**Đường nạp sách** (`lib/classics/`):
+1. Tạo `lib/classics/data/<ten-sach>.ts` export một object theo interface `Book`
+   (`lib/classics/types.ts:29` — `title / slug / dynasty / author / intro / wordCount / chapters`).
+2. Thêm vào mảng `ALL_BOOKS` tại `lib/classics/index.ts:14` — **đúng một dòng**.
+3. Xong. `/library/[book]` và `/library/search` tự nhận vì cả hai đọc từ `ALL_BOOKS`;
+   `TOTAL_PARAGRAPHS` tự cộng. **Không sửa component nào.**
+
+Hiện đã có 3 sách / 75 đoạn (`gusuifu` 29, `quanji` 29, `quanshu` 17).
+
+**Chỗ để bản dịch tiếng Việt — đã có và đã được render.** Interface `Paragraph`
+(`lib/classics/types.ts:8`) khai báo:
+```ts
+text: string;            // nguyên văn cổ văn
+translation?: string;    // "现代翻译（可选，未来填充）" — dịch hiện đại, để trống toàn bộ hiện nay
+niNote?: string;         // chú giải Ni sư, có ghi nguồn
+```
+Cả hai field **đã được render có điều kiện** tại
+`app/library/[book]/[chapter]/page.tsx:103` (`translation`) và `:118` (`niNote`), mỗi cái có
+kiểu riêng. Nghĩa là muốn hiện chú giải Việt cho một đoạn, chỉ việc điền chữ vào `translation` —
+**zero thay đổi giao diện**. Đây là chỗ tự nhiên nhất để đặt tiếng Việt cho sách cổ, và nó
+không xung đột gì với nguyên văn Hán.
+
+**Ràng buộc bản quyền khi thêm sách — quan trọng hơn phần kỹ thuật.**
+Sách hiện có được ghi rõ là 公版 (public domain) trong `lib/classics/types.ts:4`. Khi nạp sách mới:
+- **An toàn:**古籍公版 (Ngũ Hành Loại?, các bản cổ hết hạn bảo hộ), tự do dùng cả thương mại.
+- **Không tự nhiên mà được:** sách in hiện đại, bản dịch/đào tạo có bản quyền, và **bản ghi giảng
+  của Ni Hải Hạ** — xem mục 6.
+- Mỗi file sách mới phải có comment đầu file ghi rõ nguồn + tình trạng bản quyền, theo đúng
+  cách repo đang làm.
+
+## 6. Bản quyền — phải đọc trước khi dùng cho khách
+
+Repo này **không có một giấy phép duy nhất**. Bốn lớp, đọc từ chính các file license:
+
+| Nội dung | Giấy phép | Dùng thương mại? |
+|---|---|---|
+| Code (`LICENSE`) | MIT | ✅ Được |
+| Dataset sample/interpretation (GitHub Releases, `DATASET-LICENSE`) | CC BY 4.0 | ✅ Được, **bắt buộc ghi nguồn** |
+| Cổ văn trong `lib/classics/` | 公有领域 (public domain) — ghi tại `lib/classics/types.ts:4` và `DATASET-LICENSE:15` | ✅ Được |
+| **Trích giảng Ni Hải Hạ** trong `docs/tianji-ziwei/*.md` (24 file `.md`) | **CC BY-NC-SA 4.0** — `docs/tianji-ziwei/LICENSE.md` nói rõ mục này **không** theo MIT, không theo DATASET-LICENSE,著作权归倪海厦及权利继承人 | ❌ **Không** |
+
+**Chỗ cần dừng lại:** `DATASET-LICENSE:41-44` ghi nguyên văn rằng các lời trích 《天纪》 trong văn
+giải đoán **không nằm trong phạm vi授权 của dataset**, muốn dùng thành批次 thì phải theo
+CC BY-NC-SA 4.0. Mà `lib/nihai/tianji.ts` (548 dòng) và `renji.ts` (659 dòng) chính là cơ sở dữ
+liệu cấu trúc hóa từ các bài giảng đó.
+
+Hệ quả thẳng thắn: **bản dịch tiếng Việt là một tác phẩm phái sinh**, nên mang theo điều kiện NC.
+Dịch corpus 天纪 sang Việt rồi đưa cho khách trả tiền dùng — vượt quá quyền mà repo cấp, dù chỉ
+một dòng code cũng không sửa được điều đó. Đây là quyết định pháp lý/kinh doanh của bạn, không
+phải trở ngại kỹ thuật, nên tôi nêu ở đây trước khi bắt đầu đợt C.
+
+Lựa chọn của người dùng (đã chốt): **dịch corpus nhưng chỉ để trong khu nghiên cứu miễn phí.**
+Áp dụng vào thực tế repo này như sau — và thực tế khác với lo ban đầu:
+
+- `lib/nihai/` **không được render ở đâu cả** (đã kiểm chứng, xem mục 4 Đợt C). Nên quyết định
+  "khu nghiên cứu miễn phí" hiện **không việc gì phải làm trong đợt C**: không có màn hình nào
+  chứa lời giảng để mà dịch hay mà giấu.
+- Việc còn lại chỉ là **quy tắc cho tương lai**: nếu về sau bạn muốn *bật* `lib/nihai` lên UI
+  (trang nghiên cứu 研究), thì nội dung tiếng Việt của nó phải nằm ở khu không thu phí,
+  không upsell, không quảng bá bằng nó, giữ nguyên notice CC BY-NC-SA và ghi 著作权归倪海厦及权利继承人.
+  Bản dịch Việt là tác phẩm phái sinh nên mang theo NC-SA vĩnh viễn, không "rửa" được bằng cách dịch.
+- Phần **đang thực sự** hiện trong UI liên quan tới Ni Hải Hạ chỉ là *chữ để gọi tên hệ thống*:
+  `app/knowledge/page.tsx:11-13,47` và `app/heming/page.tsx:199,247` ghi "基于倪海厦《天纪》体系".
+  Đây là dẫn giải tên (nominative reference), không phải trích nguyên văn, và nội dung tri thức
+  mà trang đó render đến từ `lib/ziwei/constants.ts` / `school-data` do repo tự viết (MIT).
+  Dịch sang Việt thì vẫn giữ cách diễn đạt "theo hệ thống Thiên Cơ của Ni Hải Hạ" là an toàn.
+- `docs/tianji-ziwei/*.md` (24 file) là nội dung NC-SA thật, nằm trong repo dưới dạng tài liệu
+  nguồn chứ không phải trang sản phẩm. Fork lên GitHub **công khai** kèm các file này là redistribution
+  theo NC-SA — cho phép, miễn là repo/dự án không mang tính thương mại đối với chính nội dung đó.
+  Nếu sau này repo thành mã nguồn sản phẩm bán hàng, cân nhắc tắt quyền truy cập thư mục này
+  hoặc chuyển repo sang private.
+- Nếu dùng dataset CC BY 4.0 (file sample/interpretation trên GitHub Releases) thì **bắt buộc ghi
+  nguồn** theo `DATASET-LICENSE:28-39` — đặt ở About/footer một dòng: `本项目使用 紫微斗数开源样本
+  数据集 v3.0 / 解读数据集 v4.0 · 来源 https://github.com/Renhuai123/ziwei-doushu · 作者 王多鱼AI`.
+  Đây là điều kiện duy nhất của license đó, không trả tiền hay xin phép được.
+- Giữ nguyên các file `LICENSE` / `DATASET-LICENSE` / `docs/tianji-ziwei/LICENSE.md` — đừng xóa,
+  đó chính là bằng chứng tôn trọng giấy phép.
+
+## 7. Kiểm thử và chốt an toàn
 
 1. **Giữ `npm test` xanh** (17 bộ hiện tại) — đây là bằng chứng engine không bị chạm.
    Chạy trước/sau từng đợt.
 2. **Test mới `scripts/regression/terminology-coverage.test.ts`** — quét tĩnh, không phải
-   runtime (runtime accumulation sẽ tái tạo đúng cái bug state toàn cục đã loại ở mục 2.3):
+   runtime (runtime accumulation sẽ tái tạo đúng cái bug state toàn cục đã loại ở mục 2, ý 3):
    - Mọi literal tiếng Trung nằm trong `app/**` và `components/**` phải có mục trong
      `ui-phrases.ts`, trừ danh sách loại trừ **tường minh**: một mảng `EXCLUDE` khai báo từng
      literal kèm lý do (comment, chuỗi debug, tên file test). Không có cơ chế "bỏ qua theo
@@ -248,17 +336,17 @@ không chỉ dựa vào lý thuyết.
    1990-06-15 10h, ở desktop + mobile, đối chiếu ô lá số không tràn chữ. Không kết luận "UI ổn"
    chỉ vì build pass.
 
-## 6. Rủi ro và giới hạn (nói thẳng)
+## 8. Rủi ro và giới hạn (nói thẳng)
 
 | Rủi ro | Thực tế | Giảm thiểu |
 |---|---|---|
 | Bản dịch thuật ngữ sai | Tử Vi Việt có nhiều trường phái dùng từ khác nhau; iztro không phải chuẩn mực của Việt Nam | Mặc định có nguồn + ghi trong `note`; danh sách `TERMINOLOGY-REVIEW.md`; sửa 1 dòng là lan tỏa hết |
-| Bản dịch văn dài sai ý | Khoảng **3.300 dòng CJK** cần dịch văn (`patterns` 1126 + `nihai` 1027 + `page.tsx` ~1118 + `seo` 41), do công cụ tạo | Việt + nguyên văn Hán cạnh nhau để phát hiện; ưu tiên cách diễn đạt sát câu gốc thay vì paraphrase |
+| Bản dịch văn dài sai ý | Khoảng **2.300 dòng CJK** cần dịch văn (`patterns` 1126 + `page.tsx` ~1118 + `seo` 41), do công cụ tạo. Không tính `lib/nihai` (mục 4 Đợt C). | Việt + nguyên văn Hán cạnh nhau để phát hiện; ưu tiên cách diễn đạt sát câu gốc thay vì paraphrase |
 | Repo diverge khỏi upstream | Mọi sửa đổi nằm trong clone của repo OSS, `git pull` sau này sẽ conflict | Gom thay đổi vào file mới (`lib/i18n/*`, `components/Bi.tsx`); chỉ sửa tối thiểu trong file gốc; làm trên branch riêng `feat/vi-bilingual` |
 | Layout vỡ vì chữ Việt dài hơn chữ Hán | Lá số 12 ô mật độ cao | Screenshot 2 breakpoint mỗi đợt; class ẩn chữ Hán ở ô hẹp |
-| Không có AI giải đoán tiếng Việt | `/api/interpret` không tồn tại ở bản open-source | Ngoài phạm vi — ghi rõ ở mục 8 |
+| Không có AI giải đoán tiếng Việt | `/api/interpret` không tồn tại ở bản open-source | Ngoài phạm vi — ghi rõ ở mục 10 |
 
-## 7. Trình tự triển khai
+## 9. Trình tự triển khai
 
 Mỗi đợt kết thúc bằng: `npm test` + `npm run typecheck` + regenerate báo cáo thuật ngữ +
 screenshot, rồi báo cáo lại. Không dồn cả ba rồi mới đưa bạn xem.
@@ -267,15 +355,16 @@ screenshot, rồi báo cáo lại. Không dồn cả ba rồi mới đưa bạn 
 A0  sync-terms + glossary + Bi.tsx + coverage test    → khung chạy được, đo độ phủ thật
 A1  ChartBoard + BirthForm + nav + StarDetailPanel    → xem được lá số bằng tiếng Việt
 B   patterns + STAR_DESCRIPTIONS + InsightPanel       → giải đoán ra tiếng Việt
-C   landing + SEO + nihai + heming + trang /thuat-ngu → phủ hết surface
+C   landing + SEO + chú giải classics + heming + /thuat-ngu → phủ hết surface
 ```
 
 Điểm đo được ở A0 và không đoán trước: số mục iztro thiếu so với 85 ID sao của repo. Báo cáo
 thuật ngữ sẽ trả lời con số này bằng bằng chứng thay vì ước lệ.
 
-## 8. Ngoài phạm vi
+## 10. Ngoài phạm vi
 
-- Không dịch kinh văn trong `lib/classics` (chỉ chú giải).
+- Không dịch kinh văn trong `lib/classics` — chú giải Việt đặt vào field `translation` đã có sẵn
+  (mục 5), nguyên văn Hán giữ nguyên.
 - Không dịch tên huyện/thị trong `lib/ziwei/cities.ts` (chỉ cấp tỉnh).
 - Không đổi thuật ngữ trong dữ liệu engine, không đổi `astro.bySolar(..., 'zh-CN')`.
 - Không xây backend AI `/api/interpret`; không làm bản tiếng Việt cho nội dung do AI sinh ra.
