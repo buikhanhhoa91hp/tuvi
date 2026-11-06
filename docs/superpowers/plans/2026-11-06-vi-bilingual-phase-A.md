@@ -502,7 +502,7 @@ ok(m.missing === true && m.vi === m.zh, 'thieu cau: missing=true, vi===zh');
 
 // Câu nội suy: BirthForm.tsx:115 ghép `${y}年${m}月${d}日`
 const f = biFmt('{y}年{m}月{d}日', { y: 1990, m: 6, d: 15 });
-ok(f.vi === '15/06/1990', `noi suy → date VN (thực tế: ${f.vi})`);
+ok(f.vi === '15/6/1990', `noi suy → date VN (thực tế: ${f.vi})`);  // R17: biFmt KHONG pad so; caller tu pad (Task 8 Step 3)
 ok(f.zh === '1990年6月15日', `noi suy → giu nguyen van Han (thực tế: ${f.zh})`);
 ok(f.missing === false, 'biFmt tim thay key');
 
@@ -510,7 +510,7 @@ ok(f.missing === false, 'biFmt tim thay key');
 ok(biFmt('{m}月没有{d}日', { m: 2, d: 30 }).vi === 'Ngày 30 không có trong tháng 2', 'câu ngày không tồn tại');
 
 // Placeholder khong co trong args -> giữ nguyên {x}, không ném
-ok(biFmt('{a}月', { b: 1 }).missing === false, 'thieu arg khong crash');
+ok(biFmt('{a}月', { b: 1 }).missing === true, 'template khong co trong bang -> missing:true (R14: tra bang exact-key, khong fuzzy)');
 
 // Moi key trong UI_VI khong duoc trung voi mot thuat ngu don le
 ok(Object.keys(UI_VI).length > 0, `UI_VI có ${Object.keys(UI_VI).length} mục`);
