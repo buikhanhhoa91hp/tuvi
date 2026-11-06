@@ -204,7 +204,7 @@ const palaceVi = require(`${BASE}/vi-VN/palace.js`).default as Record<string, st
 for (const key of Object.keys(palaces)) {
   const zhVal = palaces[key];
   const viVal = palaceVi[key];
-  if (!CJK.test(viVal)) continue;
+  if (!CJK.test(zhVal) || CJK.test(viVal)) continue;
   const full = zhVal.endsWith('宫') ? zhVal : zhVal + '宫';
   if (full !== zhVal && !table.has(full)) { table.set(full, viVal); suffixVariants++; }
 }
