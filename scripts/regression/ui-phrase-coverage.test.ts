@@ -36,6 +36,9 @@ export const ADOPTED: string[] = [
   'components/TimeNav.tsx',
   'components/ChartSummary.tsx',
   'components/StarDetailPanel.tsx',
+  // Task c1: trang chu (landing page). Rule R30 - Vietnamese REPLACE Chinese
+  // via biText(...).vi inline, not <Bi mode="text">.
+  'app/page.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,
