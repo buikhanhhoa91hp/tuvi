@@ -13,6 +13,12 @@
  *   (b) duoc khai bao tuong minh trong EXCLUDE kem ly do.
  * Vi vay extractor phai tra ca OFFSET cua tung literal de doi chieu voi pham vi loi
  * dich (translationSpans), khong chi tra ban than chuoi nhu Task 5.
+ *
+ * R29 — JSX text da dong: vong JSX_TEXT truoc day chay TUNG DONG nen `>…<` bat buoc
+ * cung dong; literal nam mot minh tren dong cua no ( mutation <h1>\n 紫微斗数排盘\n</h1>,
+ * hay xoa <Bi> khoi JSX child o app/chart/page.tsx:55) lot luoi. extractor gio chay
+ * tren toan bo file text (comment bi xoa trang truoc khi scan), nen `>…<` duoc phep
+ * bao newline. Quy tac R28 (a)/(b) giu nguyen.
  */
 import { readFileSync } from 'node:fs';
 import { UI_VI, UI_FMT_VI } from '../../lib/i18n/ui-phrases';
@@ -78,42 +84,118 @@ const TEMPLATE_OK = new Set<string>([
 type Hit = [string, boolean, number, number, number];
 
 const QUOTED = /'([^'\\\n]*)'|"([^"\\\n]*)"|`([^`\\\n]*)`/g;
-const JSX_TEXT = />([^<>{}\n]*[\u4e00-\u9fff][^<>{}\n]*)</g;
+/**
+ * R29: BỎ `\n` khỏi lớp phủ định. Task 5 chạy extractor TUNG DONG, nen `>` va `<`
+ * bat buoc nam cung mot dong — dua text JSX ra khoi tam ngam khi literal nam mot
+ * minh tren dong cua no (dang pho bien nhat khi format/prettier tach the):
+ *   <h1>\n  紫微斗数排盘\n</h1>          (mutation A)
+ *   <button …>\n  ← 重新起盘\n</button>   (mutation B: xoa <Bi> khoi JSX child)
+ * Chay tren TOAN BO file (da xoa comment) thi `>…<` duoc phep bao newline, va hai
+ * mutation tren bi bat: group duoc trim, ket qua toan khoang trang bi loai, con lai
+ * van tinh la literal thuong (khong phai template).
+ */
+const JSX_TEXT = />([^<>{}]*[\u4e00-\u9fff][^<>{}]*)</g;
+
+/**
+ * Xoa noi dung comment bang khoang trang, GIU NGUYEN do dai va newline de moi offset
+ * van doi chieu duoc với translationSpans (source goc).
+ *
+ * May trang thai chay tren toan bo file va chi coi `//` hay mo dau `/*` (cap ket thuc
+ * star-slash) la comment khi con tro NGOAI chuoi, nen 'https://…' hay `//` trong template
+ * literal khong bi cat nham.
+ * Thu tu duyet cung dam nguoc lai: `//` trong comment (ke ca dau nhac don tieng Anh nhu
+ * "Don't") da bi trang hoa TRUOC khi may nhin thay no, nen khong mo chuoi ma.
+ * Dau nhac ket thuc som (khong dong ngoac) duoc coi la khong phai chuoi de khong
+ * "an" phan con lai cua file.
+ */
+export function blankComments(src: string): string {
+  const n = src.length;
+  /** i → j (khong ke j) thay bang khoang trang, GIU newline de so dong khong doi. */
+  const blank = (i: number, j: number): string => {
+    let s = '';
+    for (let k = i; k < j; k++) s += src[k] === '\n' ? '\n' : ' ';
+    return s;
+  };
+  const parts: string[] = [];
+  let i = 0;
+  let copy = 0; // doan code thuong dang sao chep lien tuc [copy, i)
+  while (i < n) {
+    const c = src[i];
+    const d = src[i + 1];
+    const isLine = c === '/' && d === '/';
+    const isBlock = c === '/' && d === '*';
+    const isQuote = c === '"' || c === "'" || c === '`';
+    if (!isLine && !isBlock && !isQuote) { i++; continue; }
+    if (copy < i) parts.push(src.slice(copy, i));
+    if (isLine) {
+      let j = i;
+      while (j < n && src[j] !== '\n') j++;
+      parts.push(blank(i, j));
+      i = copy = j;
+      continue;
+    }
+    if (isBlock) {
+      let j = i + 2;
+      while (j < n && !(src[j] === '*' && src[j + 1] === '/')) j++;
+      j = Math.min(n, j + 2);
+      parts.push(blank(i, j));
+      i = copy = j;
+      continue;
+    }
+    const end = skipString(src, i);
+    if (end >= n && src[n - 1] !== c) {
+      parts.push(c); // dau nhac loang: khong mo chuoi, de phan sau van duoc xem comment
+      i++;
+      copy = i;
+      continue;
+    }
+    parts.push(src.slice(i, end)); // chuoi giu nguyen: `//` BEN TRONG khong phai comment
+    i = copy = end;
+  }
+  if (copy < n) parts.push(src.slice(copy, n));
+  return parts.join('');
+}
+
+/** So dong 1-based cua mot offset (danh sach offset dau dong + binary search). */
+function lineFinder(src: string): (at: number) => number {
+  const starts = [0];
+  for (let i = 0; i < src.length; i++) if (src[i] === '\n') starts.push(i + 1);
+  return (at: number) => {
+    let lo = 0;
+    let hi = starts.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (starts[mid] <= at) lo = mid;
+      else hi = mid - 1;
+    }
+    return lo + 1;
+  };
+}
 
 /** Lay moi chuoi literal chua chu Han, bo comment. Trả về [chuoi, laTemplate, offsets, dong]. */
 export function extractCjkLiterals(source: string): Hit[] {
   const out: Hit[] = [];
-  let lineStart = 0;
-  let lineNo = 0;
-  for (const rawLine of source.split('\n')) {
-    lineNo++;
-    const trimmed = rawLine.trim();
-    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
-      lineStart += rawLine.length + 1;
-      continue;
-    }
-    // bỏ comment cuối dòng khi nó nằm ngoài chuỗi (đơn giản: chỉ cắt khi có // sau một ' hoặc " hoặc đầu dòng)
-    const line = trimmed.replace(/^(\/\/|\*).*$/, '');
-    // `lead` quy chieu index tren `line` (da trim trai+phai) ve offset tuyet doi trong source.
-    const lead = trimmed.length === 0 ? 0 : rawLine.indexOf(trimmed);
-    const base = lineStart + lead;
-    for (const m of line.matchAll(QUOTED)) {
-      const s = m[1] ?? m[2] ?? m[3];
-      if (!s || !CJK.test(s)) continue;
-      const isTemplate = m[3] !== undefined && s.includes('${');
-      const at = base + m.index;
-      out.push([s, isTemplate, at, at + m[0].length, lineNo]);
-    }
-    // R24: JSX text thuan (<h1>紫微斗数排盘</h1>) la dang pho bien nhat cua text UI trong repo
-    // va hoan toan vo hinh voi pattern chuoi tro ben tren. Doan text nam giua `>` va `<` tren
-    // cung mot dong duoc bat o day va báo nhu literal thuong (khong phai template).
-    for (const m of line.matchAll(JSX_TEXT)) {
-      const s = m[1].trim();
-      if (!s) continue;
-      const at = base + m.index + 1 + (m[1].length - m[1].replace(/^\s+/, '').length);
-      out.push([s, false, at, at + s.length, lineNo]);
-    }
-    lineStart += rawLine.length + 1;
+  const src = blankComments(source);
+  const lineOf = lineFinder(src);
+  for (const m of src.matchAll(QUOTED)) {
+    const s = m[1] ?? m[2] ?? m[3];
+    if (!s || !CJK.test(s)) continue;
+    const isTemplate = m[3] !== undefined && s.includes('${');
+    const at = m.index;
+    out.push([s, isTemplate, at, at + m[0].length, lineOf(at)]);
+  }
+  // R24 + R29: JSX text thuan (<h1>紫微斗数排盘</h1> va ban in nhieu dong cua no) la
+  // dang pho bien nhat cua text UI trong repo va hoan toan vo hinh voi pattern chuoi.
+  // Doan text giua `>` va `<` tren toan bo file duoc bat o day va báo nhu literal
+  // thuong (khong phai template); `at` tro vao ky tu dau tieen KHONG phai khoang trang
+  // de pham vi doi chieu wiring dung cho ca JSX viet nhieu dong.
+  for (const m of src.matchAll(JSX_TEXT)) {
+    const inner = m[1];
+    const s = inner.trim();
+    if (!s) continue;
+    const lead = inner.length - inner.replace(/^\s+/, '').length;
+    const at = m.index + 1 + lead;
+    out.push([s, false, at, at + s.length, lineOf(at)]);
   }
   return out;
 }
