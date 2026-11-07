@@ -4,21 +4,26 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SITE_URL } from '@/lib/site';
+import { biText } from '@/lib/i18n/resolve';
 
+// Task c5 (dot C): title/description/keywords cua <head> da la van ban nguoi dung thay
+// (ket qua tim kiem, link preview) nen dich sang tieng Viet qua biText(...).vi (R30) —
+// dao nguoc phan quyet e0e2140 (tru day giu nguyen van Han cho SEO tieng Trung). metadataBase
+// va cac gia tri verification GIU NGUYEN.
 export const metadata: Metadata = {
-  title: '紫微命盘 · 倪海厦正宗紫微斗数',
-  description: '基于倪海厦正宗紫微斗数体系，AI深度解读您的命盘格局、大限流年、感情事业财富健康全方位解析',
-  keywords: '紫微斗数, 倪海厦, 紫微斗数全集, 紫微斗数全书, 骨髓赋, 命盘, 命理, 14主星, 12宫位',
+  title: biText('紫微命盘 · 倪海厦正宗紫微斗数').vi,
+  description: biText('基于倪海厦正宗紫微斗数体系，AI深度解读您的命盘格局、大限流年、感情事业财富健康全方位解析').vi,
+  keywords: biText('紫微斗数, 倪海厦, 紫微斗数全集, 紫微斗数全书, 骨髓赋, 命盘, 命理, 14主星, 12宫位').vi,
   metadataBase: new URL(SITE_URL),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: '紫微命盘 · 倪海厦正宗紫微斗数',
-    description: '基于倪海厦正宗紫微斗数体系，AI深度解读您的命盘格局、大限流年、感情事业财富健康全方位解析',
+    title: biText('紫微命盘 · 倪海厦正宗紫微斗数').vi,
+    description: biText('基于倪海厦正宗紫微斗数体系，AI深度解读您的命盘格局、大限流年、感情事业财富健康全方位解析').vi,
     url: SITE_URL,
-    siteName: '紫微研究',
-    locale: 'zh_CN',
+    siteName: biText('紫微研究').vi,
+    locale: 'vi_VN',
     type: 'website',
   },
   // 站长平台验证（拿到 verification code 后填入对应字段，重新部署即可）
@@ -37,8 +42,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // lang="vi": tieng Viet la ngon ngu hien thi chinh (Task 9). Tu Task c5 metadata.locale
+  // cung la 'vi_VN' — title/description/keywords da dich, khong con chech ngon ngu.
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('ziwei-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);else document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();` }} />
       </head>

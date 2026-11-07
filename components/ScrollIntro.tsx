@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { biText } from '@/lib/i18n/resolve';
 
 interface ScrollIntroProps {
   onComplete: () => void;
@@ -8,9 +9,14 @@ interface ScrollIntroProps {
   skipLabel?: string;
 }
 
-const BEIDOU = ['天枢', '天璇', '天玑', '天权', '玉衡', '开阳', '摇光'];
+//北斗七星: nhan trang tri tren dau cuon. Day la CHU HIEN THI (khong phai khoa du lieu),
+// nen moi ten di qua biText va vế Việt thay vế Hán theo R30.
+const BEIDOU = [
+  biText('天枢').vi, biText('天璇').vi, biText('天玑').vi, biText('天权').vi,
+  biText('玉衡').vi, biText('开阳').vi, biText('摇光').vi,
+];
 
-export default function ScrollIntro({ onComplete, skipLabel = '跳 过' }: ScrollIntroProps) {
+export default function ScrollIntro({ onComplete, skipLabel = biText('跳 过').vi }: ScrollIntroProps) {
   // visible：整个 intro 是否在显示
   // unrolled：卷轴是否已展开（控制内容浮现）
   const [visible, setVisible] = useState(true);
@@ -159,7 +165,7 @@ export default function ScrollIntro({ onComplete, skipLabel = '跳 过' }: Scrol
                   textShadow: '0 1px 0 rgba(255,250,235,0.3)',
                   whiteSpace: 'nowrap',
                 }}>
-                  紫微命盘
+                  {biText('紫微命盘').vi}
                 </h1>
 
                 {/* 副标 楷体 */}
@@ -172,7 +178,7 @@ export default function ScrollIntro({ onComplete, skipLabel = '跳 过' }: Scrol
                   marginBottom: '6px',
                   whiteSpace: 'nowrap',
                 }}>
-                  观 天 之 象 · 察 人 之 命
+                  {biText('观 天 之 象 · 察 人 之 命').vi}
                 </div>
                 <div style={{
                   fontSize: 'clamp(11px, 1.2vw, 14px)',
@@ -182,7 +188,7 @@ export default function ScrollIntro({ onComplete, skipLabel = '跳 过' }: Scrol
                   whiteSpace: 'nowrap',
                   opacity: 0.85,
                 }}>
-                  倪海厦《天纪》正宗体系
+                  {biText('倪海厦《天纪》正宗体系').vi}
                 </div>
 
                 {/* 朱砂方印 */}
@@ -208,8 +214,8 @@ export default function ScrollIntro({ onComplete, skipLabel = '跳 过' }: Scrol
                     fontSize: 'clamp(11px, 1.2vw, 13px)',
                   }}
                 >
-                  <div style={{ display: 'flex', gap: '0' }}><span>王</span><span>多</span></div>
-                  <div style={{ display: 'flex', gap: '0' }}><span>鱼</span><span>印</span></div>
+                  <div style={{ display: 'flex', gap: '0' }}><span>{biText('王').vi}</span><span>{biText('多').vi}</span></div>
+                  <div style={{ display: 'flex', gap: '0' }}><span>{biText('鱼').vi}</span><span>{biText('印').vi}</span></div>
                 </motion.div>
 
                 {/* 底部装饰：八卦 */}

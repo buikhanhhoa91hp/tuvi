@@ -6,6 +6,8 @@ import { SHICHEN } from '@/lib/ziwei/constants';
 import { useTheme } from '@/components/ThemeProvider';
 import { PROVINCES } from '@/lib/ziwei/cities';
 import { formToBirthInfo, calcTrueSolarBranch } from '@/lib/ziwei/share';
+import { biFmt, biPlace, biTerm, biText, viPlace } from '@/lib/i18n/resolve';
+import Bi from './Bi';
 
 export interface BirthFormState {
   name: string;
@@ -30,6 +32,14 @@ interface BirthFormProps {
   hideSubmit?: boolean;
 }
 
+/**
+ * thập nhị địa chi — KHÔNG GIAN KEY của biểu mẫu: mảng tra theo chỉ số canh giờ
+ * (SHICHEN[branch]) và giá trị gửi đi vẫn là ký tự Hán gốc. Mảng giữ nguyên văn: mọi chỗ
+ * NÓ ĐƯỢC IN RA (dòng summary chip, dòng giờ thật–mặt trời) đi qua
+ * biTerm(zh + '时', 'hour'), nên người dùng không thấy ký tự trần. 12 literal khai báo
+ * tường minh trong EXCLUDE của ratchet kèm lý do — KHÔNG thêm 12 bản dịch trùng lặp vào
+ * UI_VI (ký tự trần chỉ là nửa key; '子'→'Tý', '子时'→'Giờ Tý' đã có trong terms).
+ */
 const SHICHEN_NAMES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 
 /** 检查日期是否合法 */
@@ -89,12 +99,12 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
   const d = parseInt(form.day) || 0;
 
   const errors = {
-    year: !form.year ? '请选择出生年份'
-      : y < 1900 || y > 2026 ? '年份范围：1900–2026'
+    year: !form.year ? biText('请选择出生年份').vi
+      : y < 1900 || y > 2026 ? biText('年份范围：1900–2026').vi
       : '',
-    month: !form.month ? '请选择月份' : '',
-    day: !form.day ? '请选择日期'
-      : form.year && form.month && !isValidDate(y, m, d) ? `${m}月没有${d}日`
+    month: !form.month ? biText('请选择月份').vi : '',
+    day: !form.day ? biText('请选择日期').vi
+      : form.year && form.month && !isValidDate(y, m, d) ? biFmt('{m}月没有{d}日', { m, d }).vi
       : '',
   };
   const hasError = Object.values(errors).some(Boolean);
@@ -112,10 +122,15 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
   const showSummary = steps[0] && steps[2] && !hasError;
   const summaryText = showSummary
     ? [
-        `${y}年${m}月${d}日`,
-        form.city || (form.province ? form.province : ''),
-        form.unknownTime ? '时辰不详' : `${SHICHEN_NAMES[branch]}时`,
-        form.gender === 'male' ? '男' : '女',
+        // R17: biFmt không pad hô — call site pad sẵn để vế Việt ra '15/06/1990'.
+        biFmt('{y}年{m}月{d}日', {
+          y, m: String(m).padStart(2, '0'), d: String(d).padStart(2, '0'),
+        }).vi,
+        form.city || (form.province ? (viPlace(form.province) ?? form.province) : ''),
+        form.unknownTime
+          ? biText('时辰不详').vi
+          : biTerm(SHICHEN_NAMES[branch] + '时', 'hour').vi,
+        biTerm(form.gender === 'male' ? '男' : '女', 'gender').vi,
       ].filter(Boolean).join(' · ')
     : '';
 
@@ -204,7 +219,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
     >
       {/* 标题 */}
       <h3 style={{ color: goldText, fontSize: '12px', letterSpacing: '0.4em', textAlign: 'center', marginBottom: '20px', fontWeight: 500 }}>
-        ── 输入生辰八字 ──
+        ──{' '}<Bi mode="text" zh="输入生辰八字" />{' '}──
       </h3>
 
       {/* ── 进度条 ── */}
@@ -221,10 +236,10 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 姓名 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>姓名（可选）</label>
+        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}><Bi mode="text" zh="姓名（可选）" /></label>
         <input
           type="text"
-          placeholder="请输入姓名"
+          placeholder={biText('请输入姓名').vi}
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
           style={inputStyle}
@@ -235,7 +250,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生日期 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>出生日期（公历）</label>
+        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}><Bi mode="text" zh="出生日期（公历）" /></label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
           <div>
             <select
@@ -244,7 +259,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={showErr('year') && errors.year ? errorInputStyle : inputStyle}
               required
             >
-              <option value="">年份</option>
+              <option value="">{biText('年份').vi}</option>
               {Array.from({ length: 127 }, (_, i) => 2026 - i).map(yr => (
                 <option key={yr} value={String(yr)}>{yr}</option>
               ))}
@@ -258,9 +273,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={showErr('month') && errors.month ? errorInputStyle : inputStyle}
               required
             >
-              <option value="">月份</option>
+              <option value="">{biText('月份').vi}</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map(mo => (
-                <option key={mo} value={String(mo)}>{mo} 月</option>
+                <option key={mo} value={String(mo)}>{biFmt('{m} 月', { m: mo }).vi}</option>
               ))}
             </select>
             <FieldError msg={showErr('month') ? errors.month : ''} />
@@ -272,9 +287,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={showErr('day') && errors.day ? errorInputStyle : inputStyle}
               required
             >
-              <option value="">日期</option>
+              <option value="">{biText('日期').vi}</option>
               {Array.from({ length: 31 }, (_, i) => i + 1).map(dy => (
-                <option key={dy} value={String(dy)}>{dy} 日</option>
+                <option key={dy} value={String(dy)}>{biFmt('{n} 日', { n: dy }).vi}</option>
               ))}
             </select>
             <FieldError msg={showErr('day') ? errors.day : ''} />
@@ -284,7 +299,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生地点 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>出生地点（用于真太阳时校正）</label>
+        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}><Bi mode="text" zh="出生地点（用于真太阳时校正）" /></label>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
           <select
             value={form.province}
@@ -293,9 +308,11 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             onFocus={e => { e.target.style.borderColor = focusBorder; }}
             onBlur={e => { e.target.style.borderColor = inputBorder; }}
           >
-            <option value="">省份 / 直辖市</option>
+            <option value="">{biText('省份 / 直辖市').vi}</option>
+            {/* value vẫn là tên Hán (key tra cứu + dữ liệu lưu vào lá số); nhãn là bản Việt —
+                <option> không nhận phần tử con nên chỉvế .vi, giống các option khác của form. */}
             {PROVINCES.map(p => (
-              <option key={p.name} value={p.name}>{p.name}</option>
+              <option key={p.name} value={p.name}>{viPlace(p.name) ?? p.name}</option>
             ))}
           </select>
           <select
@@ -306,7 +323,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             onFocus={e => { e.target.style.borderColor = focusBorder; }}
             onBlur={e => { e.target.style.borderColor = inputBorder; }}
           >
-            <option value="">{form.province ? '城市' : '先选省份'}</option>
+            <option value="">{form.province ? biText('城市').vi : biText('先选省份').vi}</option>
             {cityList.map(c => (
               <option key={c.name} value={c.name}>{c.name}</option>
             ))}
@@ -321,7 +338,14 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               exit={{ opacity: 0 }}
               style={{ fontSize: '10px', color: isDark ? 'rgba(180,210,235,0.85)' : 'rgba(100,70,10,0.5)', marginTop: '5px' }}
             >
-              {form.city || '（请选择城市）'} · 经度 {form.longitude.toFixed(1)}°E · 时差 {offsetMin > 0 ? '+' : ''}{offsetMin} 分钟
+              {/* Cùng hình dạng <Bi> đã dùng cho 12 canh giờ: vế Việt + span Hán nhỏ (bi-zh).
+                  Số kinh độ / lệch giờ KHÔNG đổi: ta chỉ thêm nhãn, offsetMin vẫn tính từ
+                  form.longitude — giá trị tra theo key Hán trong PROVINCES. */}
+              <span className="bi">
+                <span className="bi-vi" lang="vi">{biPlace(form.province).vi}</span>
+                <span className="bi-zh" lang="zh-Hans">{form.province}</span>
+              </span>{' · '}
+              {form.city || biText('（请选择城市）').vi} · {biText('经度').vi} {form.longitude.toFixed(1)}°E · {biText('时差').vi} {offsetMin > 0 ? '+' : ''}{offsetMin} {biText('分钟').vi}
             </motion.p>
           ) : (
             <motion.p
@@ -331,7 +355,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               exit={{ opacity: 0 }}
               style={{ fontSize: '10px', color: isDark ? 'rgba(165,185,210,0.7)' : 'rgba(140,100,20,0.45)', marginTop: '5px' }}
             >
-              * 倪海厦批命用真太阳时，建议填写出生地以自动校正时辰
+              * <Bi mode="text" zh="倪海厦批命用真太阳时，建议填写出生地以自动校正时辰" />
             </motion.p>
           )}
         </AnimatePresence>
@@ -339,7 +363,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
 
       {/* ── 出生时间 ── */}
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>出生时间（北京时间）</label>
+        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}><Bi mode="text" zh="出生时间（北京时间）" /></label>
         <div style={{ borderRadius: '14px', padding: '12px', background: panelBg, border: `1px solid ${panelBorder}`, opacity: form.unknownTime ? 0.45 : 1, pointerEvents: form.unknownTime ? 'none' : 'auto', transition: 'opacity 0.2s' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
             <select
@@ -348,7 +372,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={inputStyle}
             >
               {Array.from({ length: 24 }, (_, i) => i).map(h => (
-                <option key={h} value={String(h)}>{h.toString().padStart(2, '0')} 时</option>
+                <option key={h} value={String(h)}>{biFmt('{n} 时', { n: h.toString().padStart(2, '0') }).vi}</option>
               ))}
             </select>
             <select
@@ -357,15 +381,15 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               style={inputStyle}
             >
               {Array.from({ length: 60 }, (_, i) => i).map(min => (
-                <option key={min} value={String(min)}>{min.toString().padStart(2, '0')} 分</option>
+                <option key={min} value={String(min)}>{biFmt('{n} 分', { n: min.toString().padStart(2, '0') }).vi}</option>
               ))}
             </select>
           </div>
           {/* 真太阳时结果 */}
           <div style={{ textAlign: 'center', padding: '4px 0' }}>
-            <span style={{ fontSize: '10px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)' }}>真太阳时 → </span>
+            <span style={{ fontSize: '10px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)' }}><Bi mode="text" zh="真太阳时" /> → </span>
             <span style={{ fontSize: '15px', color: goldText, fontWeight: 600, letterSpacing: '0.08em' }}>
-              {SHICHEN_NAMES[branch]}时
+              <Bi mode="term" zh={SHICHEN_NAMES[branch] + '时'} kind="hour" />
             </span>
             {shichenInfo && (
               <span style={{ fontSize: '10px', color: isDark ? 'rgba(170,195,220,0.75)' : 'rgba(140,100,20,0.5)', marginLeft: '4px' }}>
@@ -382,14 +406,14 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             style={{ width: '14px', height: '14px', borderRadius: '4px', cursor: 'pointer' }}
           />
           <span style={{ fontSize: '10px', color: isDark ? 'rgba(165,185,210,0.7)' : 'rgba(140,100,20,0.45)' }}>
-            不知道出生时间，以子时（23:00–01:00）起盘
+            <Bi mode="text" zh="不知道出生时间，以子时（23:00–01:00）起盘" />
           </span>
         </label>
       </div>
 
       {/* ── 性别 ── */}
       <div style={{ marginBottom: '20px' }}>
-        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}>性别</label>
+        <label style={{ display: 'block', fontSize: '11px', color: labelClr, marginBottom: '6px', letterSpacing: '0.05em' }}><Bi mode="text" zh="性别" /></label>
         <div style={{ display: 'flex', gap: '10px' }}>
           {(['male', 'female'] as const).map(g => {
             const active = form.gender === g;
@@ -414,7 +438,8 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
                   cursor: 'pointer',
                 }}
               >
-                {isMale ? '♂ 男' : '♀ 女'}
+                {isMale ? '♂' : '♀'}{' '}
+                <Bi mode="term" zh={isMale ? '男' : '女'} kind="gender" />
               </motion.button>
             );
           })}
@@ -480,9 +505,9 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
               style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%' }}
             />
-            紫微起盘中…
+            <Bi mode="text" zh="紫微起盘中…" />
           </span>
-        ) : '立即起盘 · 解命运密码'}
+        ) : <Bi mode="text" zh="立即起盘 · 解命运密码" />}
       </motion.button>}
     </motion.form>
   );

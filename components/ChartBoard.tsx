@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ZiweiChart, Palace, Star } from '@/lib/ziwei/types';
 import { BRANCHES, STEMS } from '@/lib/ziwei/constants';
+import { biTerm } from '@/lib/i18n/resolve';
 import PalaceCell from './PalaceCell';
+import Bi from './Bi';
 import TimeNav, { type TimeView, getYearStemIndex, buildSiHuaOverlay } from './TimeNav';
 
 interface ChartBoardProps {
@@ -72,7 +74,15 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
     }
     return {};
   })();
-  const overlayLabel = timeView === 'daxian' ? '限' : timeView === 'liunian' ? '年' : undefined;
+  // Nhãn trên badge tứ hóa overlay. R28 buộc literal '限'/'年' NẰM TRONG một lời dịch ngay
+  // tại file này (đó là nơi sinh ra chúng), còn bản in ra màn hình vẫn chỉ do <Bi> quyết
+  // (Task 6) — không thêm nguồn nhãn thứ hai. Bản Việt lấy từ terms.override.ts (R15),
+  // kind 'misc' khớp đúng hai override '限'/'年'.
+  const overlayLabel = timeView === 'daxian'
+    ? <Bi mode="term" zh="限" kind="misc" className="bi-badge" compact />
+    : timeView === 'liunian'
+    ? <Bi mode="term" zh="年" kind="misc" className="bi-badge" compact />
+    : undefined;
 
   const handlePalaceClick = (branch: number) => {
     const isDeselecting = selectedBranch === branch;
@@ -108,7 +118,8 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
           Zi Wei Dou Shu
         </div>
         <h2 className="text-sm tracking-[0.25em] font-medium" style={{ color: 'var(--t-gold)' }}>
-          {chart.birthInfo.name ? `${chart.birthInfo.name} · ` : ''}紫微斗数命盘
+          {chart.birthInfo.name ? `${chart.birthInfo.name} · ` : ''}
+          <Bi mode="text" zh="紫微斗数命盘" />
         </h2>
       </motion.div>
 
@@ -116,7 +127,10 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
       <div
         className="grid rounded-xl overflow-hidden relative"
         style={{
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          // minmax(0, 1fr) thay vì 1fr: 1fr không co dưới min-content của ô, nên khi tên
+          // Việt dài hơn chữ Hán, 4 cột vượt bề rộng lưới và overflow-hidden cắt cột 4
+          // (đo ở 480px — xem globals.css .bi-cell). minmax(0,…) trả quyền co cho ô cung.
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gridTemplateRows: 'repeat(4, auto)',
           gap: '1px',
           background: 'var(--t-border)',
@@ -158,11 +172,27 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
           </div>
 
           <div className="text-center space-y-1">
-            <div className="text-[9px] tracking-[0.3em] font-medium" style={{ color: 'var(--t-gold)' }}>紫微斗数</div>
+            <div className="text-[9px] tracking-[0.3em] font-medium" style={{ color: 'var(--t-gold)' }}>
+              <Bi mode="text" zh="紫微斗数" compact />
+            </div>
             <div className="text-[10px] space-y-0.5" style={{ color: 'var(--t-faint)' }}>
-              <div>命宫 <span style={{ color: 'var(--t-gold)', opacity: 0.7 }}>{BRANCHES[chart.mingGongBranch]}</span></div>
-              <div>身宫 <span className="text-sky-500/70">{BRANCHES[chart.shenGongBranch]}</span></div>
-              <div className="text-[9px]" style={{ color: 'var(--t-gold)', opacity: 0.75 }}>{chart.wuxingJuName}</div>
+              {/* Nhãn Mệnh/Thân là THUẬT NGỮ cung (mode="term") để thống nhất cách gọi với
+                  PalaceCell — '命宫' ra 'Mệnh', không phải 'Mệnh cung' (brief Step 3). */}
+              <div>
+                <Bi mode="term" zh="命宫" kind="palace" compact />{' '}
+                <span style={{ color: 'var(--t-gold)', opacity: 0.7 }}>
+                  <Bi mode="term" zh={BRANCHES[chart.mingGongBranch]} kind="branch" compact />
+                </span>
+              </div>
+              <div>
+                <Bi mode="term" zh="身宫" kind="palace" compact />{' '}
+                <span className="text-sky-500/70">
+                  <Bi mode="term" zh={BRANCHES[chart.shenGongBranch]} kind="branch" compact />
+                </span>
+              </div>
+              <div className="text-[9px]" style={{ color: 'var(--t-gold)', opacity: 0.75 }}>
+                <Bi mode="term" zh={chart.wuxingJuName} kind="element" compact />
+              </div>
             </div>
           </div>
 
@@ -171,15 +201,25 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
             return (
               <div className="border border-purple-500/30 rounded-lg px-3 py-1.5 text-center"
                 style={{ background: 'rgba(147,51,234,0.06)' }}>
-                <div className="text-[8px] text-purple-500/80 mb-0.5 tracking-wider">当前大限</div>
-                <div className="text-[12px] text-purple-400 font-medium tabular-nums">{dx.startAge}–{dx.endAge}岁</div>
-                <div className="text-[9px] text-purple-500/60">{dx.palaceName}</div>
+                <div className="text-[8px] text-purple-500/80 mb-0.5 tracking-wider">
+                  <Bi mode="text" zh="当前大限" compact />
+                </div>
+                {/* Dòng 175 của bản TRƯỚC Task 7 viết `{dx.startAge}–{dx.endAge}岁` — JSX text
+                    chen biểu thức nên extractor không thấy nó (R29a). Đổi sang biFmt: chuỗi
+                    '{n1}–{n2}岁' thành literal nằm trong lời dịch, không phải template có ${}
+                    → không cần dòng nào trong TEMPLATE_OK (R7 đường (a)). */}
+                <div className="text-[12px] text-purple-400 font-medium tabular-nums">
+                  <Bi mode="fmt" template="{n1}–{n2}岁" args={{ n1: dx.startAge, n2: dx.endAge }} compact />
+                </div>
+                <div className="text-[9px] text-purple-500/60">
+                  <Bi mode="term" zh={dx.palaceName} kind="palace" compact />
+                </div>
               </div>
             );
           })()}
 
           <div className="text-[8px] text-center leading-relaxed font-mono" style={{ color: 'var(--t-faint)', opacity: 0.75 }}>
-            {chart.lunarInfo.lunarYear}·{chart.lunarInfo.isLeapMonth ? '闰' : ''}
+            {chart.lunarInfo.lunarYear}·{chart.lunarInfo.isLeapMonth ? <Bi mode="text" zh="闰" /> : ''}
             {chart.lunarInfo.lunarMonth}·{chart.lunarInfo.lunarDay}
           </div>
         </motion.div>
@@ -269,15 +309,21 @@ export default function ChartBoard({ chart, onStarSelect, onPalaceSelect, onSiHu
         className="mt-3 flex items-center justify-center gap-2 text-[9px] flex-wrap"
       >
         {[
-          { h: '化禄', c: 'text-emerald-500 border-emerald-500/30' },
-          { h: '化权', c: 'text-blue-500 border-blue-500/30' },
-          { h: '化科', c: 'text-yellow-500 border-yellow-500/30' },
-          { h: '化忌', c: 'text-red-500 border-red-500/30' },
+          // 'h' là GIÁ TRỊ ENGINE-like: chuỗi Hán hai âm của tứ hóa, dùng làm key React và
+          // để đối chiếu với chú giải màu. Nó đi qua biTerm(..).zh (đồng nhất — xem
+          // PalaceCell.tsx:SIHUA_STYLES) để không còn chuỗi Hán trần trong file ADOPTED,
+          // còn bản in ra màn hình do <Bi mode="term"> bên dưới quyết.
+          { h: biTerm('化禄', 'mutagen').zh, c: 'text-emerald-500 border-emerald-500/30' },
+          { h: biTerm('化权', 'mutagen').zh, c: 'text-blue-500 border-blue-500/30' },
+          { h: biTerm('化科', 'mutagen').zh, c: 'text-yellow-500 border-yellow-500/30' },
+          { h: biTerm('化忌', 'mutagen').zh, c: 'text-red-500 border-red-500/30' },
         ].map(({ h, c }) => (
-          <span key={h} className={`border px-1.5 py-0.5 rounded-full font-medium ${c}`}>{h}</span>
+          <span key={h} className={`border px-1.5 py-0.5 rounded-full font-medium ${c}`}>
+            <Bi mode="term" zh={h} kind="mutagen" compact />
+          </span>
         ))}
         <span className="px-1.5 py-0.5 rounded-full" style={{ color: 'var(--t-faint)', border: '1px solid var(--t-border)' }}>
-          点击宫位看三方四正
+          <Bi mode="text" zh="点击宫位看三方四正" compact />
         </span>
       </motion.div>
     </div>

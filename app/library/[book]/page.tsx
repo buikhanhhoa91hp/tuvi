@@ -5,17 +5,21 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ALL_BOOKS, getBookBySlug } from '@/lib/classics';
+import { biFmt, biText } from '@/lib/i18n/resolve';
 
 export async function generateStaticParams() {
   return ALL_BOOKS.map(b => ({ book: b.slug }));
 }
 
+// Task c5 (dot C): phan CHROME cua metadata da dich sang tieng Viet. Ten co thu + trieu dai
+// trong template la DATA tu lib/classics/data/* (khong duoc sua o dot nay) nen van de nguyen;
+// vi the khong con dong template cua file nay trong TEMPLATE_OK cua ratchet.
 export async function generateMetadata({ params }: { params: Promise<{ book: string }> }) {
   const { book: slug } = await params;
   const book = getBookBySlug(slug);
   if (!book) return {};
   return {
-    title: `《${book.title}》· ${book.dynasty} · 紫微斗数古籍原典库`,
+    title: `《${book.title}》· ${book.dynasty} · Kho cổ thư nguyên bản Tử Vi đẩu số`,
     description: book.intro,
   };
 }
@@ -30,13 +34,13 @@ export default async function BookPage({ params }: { params: Promise<{ book: str
       <div className="px-6 py-4 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(184,146,42,0.15)', background: 'var(--bg-page)' }}>
         <Link href="/library" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.3em', textDecoration: 'none' }}>
-          ← 古籍库
+          {biText('← 古籍库').vi}
         </Link>
         <div style={{ fontSize: '12px', color: 'var(--tx-3)', letterSpacing: '0.2em' }}>
           《{book.title}》
         </div>
         <Link href="/" style={{ fontSize: '12px', color: 'var(--ac)', letterSpacing: '0.2em', textDecoration: 'none' }}>
-          首页 →
+          {biText('首页 →').vi}
         </Link>
       </div>
 
@@ -57,7 +61,7 @@ export default async function BookPage({ params }: { params: Promise<{ book: str
         {/* 章节目录 */}
         <div style={{ background: 'var(--bg-card)', borderRadius: '14px', border: '1px solid rgba(184,146,42,0.2)', overflow: 'hidden' }}>
           <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(184,146,42,0.15)', fontSize: '11px', color: 'var(--tx-3)', letterSpacing: '0.3em' }}>
-            CHAPTERS · 章节目录
+            {biText('CHAPTERS · 章节目录').vi}
           </div>
           {book.chapters.map((chapter, i) => (
             <Link
@@ -89,7 +93,7 @@ export default async function BookPage({ params }: { params: Promise<{ book: str
                 )}
               </div>
               <div style={{ fontSize: '10px', color: 'var(--tx-3)', letterSpacing: '0.1em' }}>
-                {chapter.paragraphs.length} 段
+                {biFmt('{n} 段', { n: chapter.paragraphs.length }).vi}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--ac)' }}>→</div>
             </Link>
