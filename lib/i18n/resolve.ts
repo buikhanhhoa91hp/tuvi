@@ -1,6 +1,7 @@
 import { GENERATED_TERMS } from './terms.generated';
 import { OVERRIDE_BY_ZH, pickOverride } from './terms.override';
 import { UI_FMT_VI, UI_VI } from './ui-phrases';
+import { PROSE_VI } from './prose-patterns';
 import { PROVINCE_VI } from './place-vi';
 import type { BiPair, TermKind } from './terms.types';
 
@@ -64,7 +65,7 @@ export function allTermsZh(): string[] {
   return [...new Set([...Object.keys(GENERATED_TERMS), ...OVERRIDE_BY_ZH.keys()])];
 }
 
-// ─── Lớp câu/label (Task 3) — tra theo đúng literal tiếng Trung trong source ───
+// ─── Lớp câu/label (Task 3) + lớp văn luận giải (Task B1) — tra theo đúng literal tiếng Trung trong source ───
 
 /** Tra một giá trị trong bảng thường, không để prototype key ('toString', '__proto__') khớp. */
 function pick(table: Record<string, string>, key: string): string | undefined {
@@ -79,8 +80,18 @@ function fill(template: string, args: Record<string, string | number>): string {
 
 /** Tra một câu UI theo đúng literal tiếng Trung. */
 export function biText(zh: string): BiPair {
-  const vi = pick(UI_VI, zh);
+  // UI_VI trước, PROSE_VI sau: câu chrome nhẹ hơn, văn luận giải (đoạn dài của patterns.ts)
+  // nằm ở bảng riêng. Cùng một cơ chế key = literal nguyên văn, nên thứ tự chỉ quyết định
+  // bảng nào thắng nếu ai đó khai trùng một chuỗi ở cả hai (không xảy ra: guard
+  // prose-coverage in ra mọi chuỗi còn thiếu, chuỗi nào đã có một bảng là đủ).
+  // KHÔNG khớp mờ, không alias (R14 đã bỏ khớp bộ xương vì làm hỏng tín hiệu hasPhrase).
+  const vi = pick(UI_VI, zh) ?? pick(PROSE_VI, zh);
   return vi ? { zh, vi, missing: false } : { zh, vi: zh, missing: true };
+}
+
+/** Chuỗi có trong bảng văn luận giải không — guard prose-coverage dùng để đếm phần còn thiếu. */
+export function hasProse(zh: string): boolean {
+  return pick(PROSE_VI, zh) !== undefined;
 }
 
 /**

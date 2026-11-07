@@ -4,7 +4,7 @@ import type { Star } from '@/lib/ziwei/types';
 import { STAR_DESCRIPTIONS } from '@/lib/ziwei/constants';
 import { STAR_DETAIL, LUCKY_STAR_NOTES, SHA_STAR_NOTES } from '@/lib/content/starDetail';
 import Bi from './Bi';
-import { biTerm } from '@/lib/i18n/resolve';
+import { biTerm, biText } from '@/lib/i18n/resolve';
 
 interface StarDetailPanelProps {
   star: Star | null;
@@ -76,7 +76,10 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
                     engine giu nguyen (element/nature la Dot B, spec muc 4). Mau theo
                     star.brightness (enum tieng Anh) thay cho tag.includes('庙旺') cu. */}
                 <Chip><Bi mode="text" zh="五行" compact /> · {desc.element}</Chip>
-                <Chip><Bi mode="text" zh="性质" compact /> · {desc.nature}</Chip>
+                {/* nature + keyword cua STAR_DESCRIPTIONS (lib/ziwei/constants.ts, khong bao
+                    gio) la VAN luan ngan → biText(...).vi thay chuoi Hán (R30); element van la
+                    ky tu engine (DATA, doi chieu mau/sao). */}
+                <Chip><Bi mode="text" zh="性质" compact /> · {biText(desc.nature).vi}</Chip>
                 {palaceName && <Chip><Bi mode="text" zh="位置" compact /> · <Bi mode="term" zh={palaceName} kind="palace" compact /></Chip>}
                 {star.brightness && (
                   <Chip color={star.brightness === 'bright' ? '#eab308' : star.brightness === 'dim' ? '#ef4444' : 'var(--t-text2)'}>
@@ -94,7 +97,7 @@ export default function StarDetailPanel({ star, palaceName, onClose }: StarDetai
                   {desc.keywords.split('·').map(k => (
                     <span key={k} className="text-[11px] px-2 py-0.5 rounded-full"
                       style={{ color: 'var(--t-gold)', border: '1px solid rgba(212,168,67,0.2)', background: 'rgba(212,168,67,0.06)' }}>
-                      {k.trim()}
+                      {biText(k.trim()).vi}
                     </span>
                   ))}
                 </div>

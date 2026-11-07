@@ -2,6 +2,8 @@
 import { motion } from 'framer-motion';
 import type { ZiweiChart } from '@/lib/ziwei/types';
 import { detectPatterns } from '@/lib/ziwei/patterns';
+import Bi from './Bi';
+import { biTerm, biText } from '@/lib/i18n/resolve';
 
 const LevelStyle = {
   excellent: { dot: 'bg-amber-400', label: 'text-amber-500', badge: 'text-amber-500 bg-amber-500/10 border-amber-500/25' },
@@ -39,41 +41,48 @@ export default function PatternsCard({ chart }: { chart: ZiweiChart }) {
             >
               <div className="flex items-center gap-2 mb-1.5">
                 <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${st.dot}`} />
-                <span className={`text-[11px] font-medium ${st.label}`}>{p.name}</span>
+                <span className={`text-[11px] font-medium ${st.label}`}>
+                  {/* Ten cach cuc = THUAT NGU (杀破狼 → Sát Phá Lang): echo hai ngon ngu. */}
+                  <Bi mode="term" zh={p.name} kind="pattern" compact />
+                </span>
                 <div className="flex gap-1 ml-auto">
                   {p.palaces.slice(0, 2).map(pa => (
                     <span key={pa} className={`text-[8px] px-1.5 py-px rounded-full border ${st.badge}`}>
-                      {pa.replace('宫', '')}
+                      {/* replace() giu nguyen chuoi engine (qua biTerm(..).zh, khuon
+                          ChartSummary.tsx:205) de khong doi du lieu; in ra thi hai ngon ngu. */}
+                      <Bi mode="term" zh={pa.replace(biTerm('宫', 'palace').zh, '')} kind="palace" compact />
                     </span>
                   ))}
                 </div>
               </div>
 
               <p className="text-[10px] leading-relaxed pl-3.5" style={{ color: 'var(--t-text2)' }}>
-                {p.description}
+                {/* Mo ta + dieu kien la VAN luan (nhieu dong) → ban dich THAY chuoi Hán (R30),
+                    khong echo: PROSE_VI keyed dung nguyen van cua lib/ziwei/patterns.ts. */}
+                {biText(p.description).vi}
               </p>
 
               {p.conditions && (
                 <div className="mt-2 pl-3.5 space-y-0.5">
                   {p.conditions.required.length > 0 && (
                     <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                      <span className="font-medium" style={{ color: 'var(--t-gold)' }}>必须</span>
+                      <span className="font-medium" style={{ color: 'var(--t-gold)' }}><Bi mode="text" zh="必须" /></span>
                       <span style={{ opacity: 0.6 }}> · </span>
-                      {p.conditions.required.join('、')}
+                      {p.conditions.required.map((c) => biText(c).vi).join('、')}
                     </div>
                   )}
                   {p.conditions.bonus && p.conditions.bonus.length > 0 && (
                     <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                      <span className="font-medium text-emerald-500">加分</span>
+                      <span className="font-medium text-emerald-500"><Bi mode="text" zh="加分" /></span>
                       <span style={{ opacity: 0.6 }}> · </span>
-                      {p.conditions.bonus.join('、')}
+                      {p.conditions.bonus.map((c) => biText(c).vi).join('、')}
                     </div>
                   )}
                   {p.conditions.breaking && p.conditions.breaking.length > 0 && (
                     <div className="text-[9px] leading-relaxed" style={{ color: 'var(--t-text2)', opacity: 0.85 }}>
-                      <span className="font-medium text-orange-500">破格</span>
+                      <span className="font-medium text-orange-500"><Bi mode="text" zh="破格" /></span>
                       <span style={{ opacity: 0.6 }}> · </span>
-                      {p.conditions.breaking.join('、')}
+                      {p.conditions.breaking.map((c) => biText(c).vi).join('、')}
                     </div>
                   )}
                 </div>
