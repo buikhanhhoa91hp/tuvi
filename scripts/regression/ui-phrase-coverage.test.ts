@@ -64,6 +64,11 @@ export const ADOPTED: string[] = [
   // cua InsightPanel la MAY INPUT, khong phai UI -> mien tuong minh trong EXCLUDE ben duoi.
   'components/InsightPanel.tsx',
   'app/preview/page.tsx',
+  // Task c8: components/ScrollIntro.tsx — doan mo dau cuon (scroll intro) cua /preview.
+  // Toan bo chuoi tren man hinh nay la nhan/trang tri khong phai khoa du lieu, nen dich
+  // het qua biText(...).vi (R30 — tieng Viet THAY chu Hán; <Bi mode="text"> echo 2 dong
+  // se vo khung 90vw cua cua so scroll). Khong co prompt AI nao trong file nay.
+  'components/ScrollIntro.tsx',
 ];
 
 /** Literal được bỏ qua có chủ đích, kèm lý do. Không có cơ chế pattern — nếu có,

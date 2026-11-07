@@ -744,6 +744,34 @@ export const UI_VI: Record<string, string> = {
   '整体淡出，进入主页': 'toàn bộ mờ dần, chuyển vào trang chủ',              // :116
   '用户随时可点右下「跳过」直接进入主页。':
     'Người dùng có thể nhấn 「Bỏ qua」 ở góc dưới bên phải bất cứ lúc nào để vào thẳng trang chủ.', // :118
+
+  // ══ components/ScrollIntro.tsx (task c8) — doan mo dau «cuon tranh» cua /preview ══
+  // 41 chu Hán duy nhat con sot lai o /preview: task c7 dung curl nen chi thay duoc panel
+  // sau khi intro xong; phan con lai la component nay. R30 — tieng Viet THAY chu Hán
+  // (biText(...).vi), KHONG <Bi mode="text">: echo hai dong se vo day khung 90vw cua tro
+  // choi. Khong co prompt AI / khoa du lieu nao trong file → khong dong nao vao EXCLUDE.
+  // '紫微命盘' KHONG co dong moi o day: da la UI_VI :271 (同 key với title/OG cua layout.tsx)
+  // → 'Lá số Tử Vi', tai dung theo R12-don (khong trung lap khoa).
+  // Bảy sao Bắc Đẩu: am Hán-Việt chuẩn của ten thien van (khong phai ten sao Tu Vi trong
+  // termosaurus — '玉衡' vs '廉 Trinh' la hai lop ten khac nhau), nen khong trung thuat ngu.
+  '天枢': 'Thiên Xu',                                                // :15
+  '天璇': 'Thiên Toàn',                                              // :15
+  '天玑': 'Thiên Cơ',                                                // :15
+  '天权': 'Thiên Quyền',                                             // :15
+  '玉衡': 'Ngọc Hành',                                               // :16
+  '开阳': 'Khai Dương',                                              // :16
+  '摇光': 'Dao Quang',                                               // :16
+  '观 天 之 象 · 察 人 之 命': 'Xem tượng trời · soi mệnh người',      // :181 phụ đề (· là U+00B7, dấu cách U+0020 — copy nguyên văn)
+  '倪海厦《天纪》正宗体系': 'Hệ Thiên Kỷ chính truyền của thầy Ni Hải Hạ', // :191 (đối chiếu '基于倪海厦正宗体系' → 'theo chính truyền Ni Hải Hạ')
+  // Nut bo qua — source gap từng chữ (同 dang '再 播 放 一 次' :727).
+  '跳 过': 'Bỏ qua',                                                 // :19 gia tri mac dinh cua prop skipLabel
+  // Bon o nhan chu sa :217-218 = con dấu 「Vương Đa Ngư」 (tro vui ten nhan vat), in theo
+  // luong 2x2 → lay tung am, giu nguyen 4 <span> (khong doi layout). Khong chu nao la
+  // thuat ngu (guard `UI_VI ∩ hasTerm = ∅` cua ui-phrases.test.ts:45 da kiem chung).
+  '王': 'Vương',                                                    // :217
+  '多': 'Đa',                                                       // :217
+  '鱼': 'Ngư',                                                      // :218
+  '印': 'Ấn',                                                       // :218
 };
 
 /**
