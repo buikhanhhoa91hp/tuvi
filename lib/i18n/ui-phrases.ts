@@ -700,6 +700,50 @@ export const UI_VI: Record<string, string> = {
   '紫微斗数权威古籍全文检索：《紫微斗数全集》《紫微斗数全书》《骨髓赋》倪海厦《天纪》引证来源':
     'Tra cứu toàn văn các cổ thư Tử Vi đẩu số có thẩm quyền: Tử Vi Đẩu Số Toàn Tập, Tử Vi Đẩu Số Toàn Thư, Cốt Tủy Phú — nguồn dẫn chứng trong Thiên Kỷ của thầy Ni Hải Hạ', // app/library/page.tsx description
   '搜索 · 古籍原典库': 'Tìm kiếm · Kho cổ thư nguyên bản',              // app/library/search/page.tsx title
+
+  // ══ components/InsightPanel.tsx (task c7) — bang luan giai AI o /chart ══════
+  // R30: VIET THAY HAN (biText(...).vi), khong <Bi mode="text"> — panel 380px, echo 2 dong se
+  // vo day. CHI co chrome: cac prompt trong TOPIC_PROMPTS/PALACE_ROLES/dong 222-272 la dau vao
+  // cua mo hinh (KHONG hien thi: sendMessage(..., hidden = true)) nen khong dich — chung duoc
+  // mien tuong minh trong EXCLUDE/TEMPLATE_OK cua ui-phrase-coverage.test.ts, khong o kho nay.
+  // '大限'/'流年' KHONG co dong moi o day: chung da la UI_VI :79-80 (nhan tab TimeNav);
+  // InsightPanel chi dung .zh cua hai key do de giu nguyen chu Hán trong prompt.
+  '命格': 'Mệnh cách',                                                  // :26 nhan topic (mang TOPICS)
+  '感情': 'Tình cảm',                                                   // :27
+  '事业': 'Sự nghiệp',                                                  // :28
+  '财运': 'Tài vận',                                                    // :29
+  '健康': 'Sức khỏe',                                                   // :30
+  '性格': 'Tính cách',                                                  // :31
+  '命格解读生成中…': 'Đang sinh bản luận giải mệnh cách…',                // :383 trang thai loading
+  '命理解读': 'Luận giải mệnh lý',                                      // :426 nhan dau moi tin AI
+  '继续追问，如：今年适合换工作吗？':
+    'Đặt thêm câu hỏi, ví dụ: năm nay có nên đổi việc không?',            // :443 placeholder
+  '追问': 'Hỏi thêm',                                                   // :462 nut gui
+  '解读失败，请稍后重试。': 'Luận giải thất bại, vui lòng thử lại sau.',   // :315
+  '开源版不含 AI 解读接口（/api/interpret），需要你自己实现后才能用，详见 README「快速开始」。排盘本身不需要任何 API Key。':
+    'Bản mã nguồn mở không kèm giao diện luận giải AI (/api/interpret) — bạn phải tự triển khai thì mới dùng được, xem mục 「Bắt đầu nhanh」 trong README. Riêng việc lập lá số không cần bất kỳ API Key nào.', // :315 (ban open-source: /api/interpret tra 404)
+
+  // ══ app/preview/page.tsx (task c7) — trang xem thu doan mo dau (scroll intro) ══
+  // Panel chi render SAU khi ScrollIntro xong (state `done`), nen HTML cua server tai /preview
+  // chua KHONG loai chuoi nay; phan Hán con lai trong curl la components/ScrollIntro.tsx
+  // (ngoai pham vi task c7 — bao cao c7 ghi ro). '合盘' o :96 tai dung muc :272 tren.
+  '紫微卷轴 · 开场预览': 'Cuộn Tử Vi · Xem thử đoạn mở đầu',              // :40 h1
+  '刚才看到的卷轴效果会在每次进入主页时缓缓铺开。':
+    'Hiệu ứng cuộn tranh vừa xem sẽ từ từ mở ra mỗi lần bạn vào trang chủ.', // :49
+  '如果满意，告诉我，我把它接到主页 / 上线。':
+    'Nếu thấy hài lòng, hãy báo tôi để tôi gắn vào trang chủ và lên sóng.', // :50
+  '再 播 放 一 次': 'Phát lại một lần nữa',                               // :68 nut (source gap từng chữ)
+  '进 入 原 版 首 页': 'Vào trang chủ bản gốc',                            // :83 nut
+  '原版 ↗': 'Bản gốc ↗',                                                  // :92 lien ket (↗ la U+2197)
+  '命盘': 'Lá số',                                                        // :94 (doi chieu '紫微斗数命盘': 'Lá số Tử Vi')
+  '动画时间轴': 'Mốc thời gian của animation',                              // :112
+  '卷轴从中央向两侧展开': 'cuộn mở từ giữa ra hai bên',                     // :113
+  '宣纸内容浮现（标题 + 副标 + 朱砂印）':
+    'nội dung trên tuyên chỉ hiện dần (tiêu đề + phụ đề + ấn chu sa)',      // :114
+  '停留欣赏': 'lưu lại để thưởng lãm',                                    // :115
+  '整体淡出，进入主页': 'toàn bộ mờ dần, chuyển vào trang chủ',              // :116
+  '用户随时可点右下「跳过」直接进入主页。':
+    'Người dùng có thể nhấn 「Bỏ qua」 ở góc dưới bên phải bất cứ lúc nào để vào thẳng trang chủ.', // :118
 };
 
 /**

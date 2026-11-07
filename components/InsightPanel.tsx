@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ZiweiChart, Palace } from '@/lib/ziwei/types';
+import { biText } from '@/lib/i18n/resolve';
 import type { TimeView } from './TimeNav';
 
 interface Message {
@@ -22,13 +23,14 @@ interface InsightPanelProps {
   selectedSiHua?: SelectedSiHua | null;
 }
 
+/** Nhan topic (R30: tieng Viet THAY chu Hán — `key` van la khoa ASCII gui /api/interpret). */
 const TOPICS = [
-  { key: 'overview',     label: '命格' },
-  { key: 'love',        label: '感情' },
-  { key: 'career',      label: '事业' },
-  { key: 'wealth',      label: '财运' },
-  { key: 'health',      label: '健康' },
-  { key: 'personality', label: '性格' },
+  { key: 'overview',     label: biText('命格').vi },
+  { key: 'love',        label: biText('感情').vi },
+  { key: 'career',      label: biText('事业').vi },
+  { key: 'wealth',      label: biText('财运').vi },
+  { key: 'health',      label: biText('健康').vi },
+  { key: 'personality', label: biText('性格').vi },
 ] as const;
 
 const TOPIC_PROMPTS: Record<string, string> = {
@@ -252,7 +254,10 @@ ${selectedPalace.name}在命盘中的意义，以及这种星曜配置的整体�
       p.stars.some(s => s.name === selectedSiHua.starName)
     );
     const palaceName = palaceOfStar?.name ?? '未知宫位';
-    const viewLabel = selectedSiHua.view === 'daxian' ? '大限' : '流年';
+    // PROMPT payload (khong hien thi): lay .zh de giu nguyen chu Hán gui mo hinh, dong thoi
+    // cho literal nam trong mot loi dich theo R28. '大限'/'流年' da la nhan UI cua TimeNav
+    // (UI_VI :79-80) nen KHONG xin mien tru toan cuc trong EXCLUDE — tranh che vi pham tuong lai.
+    const viewLabel = selectedSiHua.view === 'daxian' ? biText('大限').zh : biText('流年').zh;
 
     const prompt = `请分析【${viewLabel}${selectedSiHua.starName}化${selectedSiHua.siHua}】的飞化影响，按以下结构输出：
 
@@ -312,7 +317,7 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
       }
     } catch (e) {
       const missing = e instanceof Error && e.message === 'api-missing';
-      setMessages(prev => [...prev, { role: 'assistant', content: missing ? '开源版不含 AI 解读接口（/api/interpret），需要你自己实现后才能用，详见 README「快速开始」。排盘本身不需要任何 API Key。' : '解读失败，请稍后重试。' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: missing ? biText('开源版不含 AI 解读接口（/api/interpret），需要你自己实现后才能用，详见 README「快速开始」。排盘本身不需要任何 API Key。').vi : biText('解读失败，请稍后重试。').vi }]);
     } finally {
       setLoading(false);
       loadingRef.current = false;
@@ -380,7 +385,7 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="text-4xl mb-3" style={{ color: 'var(--t-gold)', opacity: 0.1 }}>✦</div>
-            <p className="text-[10px] animate-pulse" style={{ color: 'var(--t-faint)' }}>命格解读生成中…</p>
+            <p className="text-[10px] animate-pulse" style={{ color: 'var(--t-faint)' }}>{biText('命格解读生成中…').vi}</p>
           </div>
         )}
 
@@ -423,7 +428,7 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
                   style={{ color: 'var(--t-faint)' }}
                 >
                   <span style={{ color: 'var(--t-gold)', opacity: 0.4 }}>✦</span>
-                  命理解读
+                  {biText('命理解读').vi}
                 </div>
                 <AiContent text={msg.content} streaming={loading && isLastMsg} />
               </motion.div>
@@ -440,7 +445,7 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder="继续追问，如：今年适合换工作吗？"
+            placeholder={biText('继续追问，如：今年适合换工作吗？').vi}
             disabled={loading}
             className="flex-1 rounded-lg px-3 py-2 text-[11px] focus:outline-none transition-colors"
             style={{
@@ -459,7 +464,7 @@ ${selectedSiHua.starName}化${selectedSiHua.siHua}落在【${palaceName}】，�
               color: 'var(--t-gold)',
             }}
           >
-            {loading ? '…' : '追问'}
+            {loading ? '…' : biText('追问').vi}
           </button>
         </div>
       </div>
