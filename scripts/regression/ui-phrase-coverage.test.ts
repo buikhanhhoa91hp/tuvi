@@ -60,8 +60,10 @@ export const ADOPTED: string[] = [
   'app/terms/page.tsx',
   // Task c7: bang giai doan AI (InsightPanel, duoc app/chart/page.tsx gan len /chart) +
   // trang xem thu /preview. Chrome dich sang tieng Viet qua biText(...).vi (R30), KHONG
-  // dung <Bi mode="text"> (se in them dong Hán vào panel 380px). Cac prompt gui mo hình
-  // cua InsightPanel la MAY INPUT, khong phai UI -> mien tuong minh trong EXCLUDE ben duoi.
+  // dung <Bi mode="text"> (se in them dong Hán vào panel 380px).
+  // C-9: prompt gửi mô hình cũng phải song ngữ (người dùng bác phán quyết "đầu vào máy giữ
+  // tiếng Trung"). Chúng nằm ở lib/i18n/ai-prompts.ts dưới dạng cặp zh/vi — bảng dịch, không
+  // thuộc ADOPTED — và được ai-prompt-bilingual.test.ts canh. File này chỉ còn gọi builder.
   'components/InsightPanel.tsx',
   'app/preview/page.tsx',
   // Task c8: components/ScrollIntro.tsx — doan mo dau cuon (scroll intro) cua /preview.
@@ -145,27 +147,18 @@ const EXCLUDE = new Set<string>([
   // ADOPTED tuong lai in tran cung chuoi do cung lot luoi — bat case do bang render test.
   '七杀朝斗 / 双禄朝垣 / 化忌 / 紫微 / 命宫 / 机月同梁', // ly do: chuoi goi thu cho may tim kiem ngu lieu Hán (search/page.tsx empty state)
 
-  // R30-dot-Task-c7 — components/InsightPanel.tsx: PROMO T payload, KHÔNG phải UI.
-  // Bang nay goi /api/interpret (ban open-source: 404) va gui cac chuoi duoi day cho mo hinh
-  // AI. Chung KHONG bai hien len man hinh: moi prompt duoc sendMessage(prompt, true) voi
-  // hidden = true (dong 322-327 + 389), tuc bong bóng user bi an. Vi vay "giu nguyen van" o
-  // day la GIU NGUYEN dau vao may, khong phai bo mot chuoi UI khong dich.
-  // Tam che (ngu nhu 12 dia chi va tu khoa SEO o tren): EXCLUDE khop TOAN CUC theo nguyen van.
-  // '命宫'/'财帛宫'/… la ten cung cua engine, con '化' la chu doi dien — file ADOPTED tuong lai
-  // in tran nhung chuoi nay se lot luoi; bat bang render test, DUNG mo rong EXCLUDE.
-  // PALACE_ROLES :133-144 — khoa tra cuu (doi chieu selectedPalace.name) + gia tri dien vao
-  // ve "主管：…" cua prompt dong 226:
-  '命宫', '兄弟宫', '夫妻宫', '子女宫', '财帛宫', '疾厄宫',
-  '迁移宫', '交友宫', '官禄宫', '田宅宫', '福德宫', '父母宫',
-  '自我、性格、先天格局', '兄弟关系、合伙人', '感情关系、婚姻状态',
-  '子女缘分、下属关系', '财运来源、收入方式', '身体健康、意外',
-  '外出机遇、人际格局', '朋友圈、贵人、小人', '事业成就、社会地位',
-  '不动产、家庭环境', '精神享受、内心福分', '父母关系、文书契约',
-  // :223 / :254 — gia tri fallback dien vao cung prompt (ve "该宫主星为…"):
-  '空宫（借对宫）', '未知宫位',
-  // :285-286 — NHAN INTERNAL: throw new Error(...) roi bi catch o :313 bo qua (chi so sánh
-  // message voi 'api-missing' la ASCII). Chuoi that nguoi dung thay la 2 branch 404/khac o :315,
-  // da dich sang tieng Viet trong UI_VI. Dich hai chuoi nay thi khong co gi thay doi voi ho.
+  // R30-dot-Task-c7 → C-9 — components/InsightPanel.tsx.
+  // TRƯỚC C-9: toan bo prompt gui /api/interpret (6 topic + prompt cung + prompt tứ hóa,
+  // PALACE_ROLES, '空宫（借对宫）', '未知宫位') nằm trần trong file này và được miễn trừ ở đây
+  // với lý do "đầu vào máy, không phải UI". Người dùng bác lý do đó: đầu vào máy cũng phải
+  // song ngữ để sau này đọc hiểu. Nay chúng chuyển tới lib/i18n/ai-prompts.ts (BẢNG DỊCH,
+  // cùng trạng thái với ui-phrases.ts / terms.override.ts — không thuộc ADOPTED) dưới dạng
+  // cặp zh/vi, và ai-prompt-bilingual.test.ts giữ bất biến "mọi dòng chỉ dẫn có cả hai vế".
+  // Vì vậy 26 dòng miễn trừ prompt + 1 dòng TEMPLATE_OK đã bị XÓA: giữ lại chúng sẽ che mất
+  // một file ADOPTED tương lai in trần đúng những chuỗi đó.
+  // Chỉ còn hai nhãn INTERNAL: throw new Error(...) rồi bị catch ở streamResponse bỏ qua
+  // (nhánh so sánh duy nhất là message === 'api-missing', ASCII). Chuỗi người dùng thật sự
+  // thấy là 2 nhánh 404/khác, đã dịch trong UI_VI. Dịch hai chữ này không đổi gì với họ.
   '请求失败', '无响应流',
 ]);
 
@@ -209,14 +202,9 @@ const TEMPLATE_OK = new Set<string>([
   // sach/ten chi/trieu dai = DATA tu lib/classics/data/*, khong duoc cham), nen ba dong
   // TEMPLATE_OK cua /library KHONG CON can thiet — da xoa.
 
-  // Task c7 — components/InsightPanel.tsx:222. Day KHONG phai mot template UI da chuyen sang
-  // biFmt (dang dung cua kho nay): no la doan ghép ten sao + tu hoa ("武曲化禄") dung de NOI
-  // VAO PROMPT gui mo hinh AI (starDesc o dong 226; prompt duoc gui voi hidden = true nen
-  // khong hien thi). Dich no = doi dau vao may, vi vay giu nguyen van va khai bao tuong minh
-  // tai day (EXCLUDE khong voi duoc template: nhanh isTemplate chay TRUOC EXCLUDE).
-  // Canh bao nhu EXCLUDE: khop toan cuc nguyen van, nen mot file ADOPTED tuong lai go dung
-  // bieu thuc nay cung lot luoi — bat bang render test, dung mở rộng khai bao nay.
-  '${s.name}${s.siHua ? \'化\' + s.siHua : \'\'}',
+  // Task c7 → C-9: dong '${s.name}${s.siHua ? \'化\' + s.siHua : \'\'}' (ghép tên sao + tứ hóa
+  // để nối vào prompt) đã chuyển tới lib/i18n/ai-prompts.ts cùng toàn bộ prompt, nên KHÔNG
+  // còn khai báo ở đây. Xem ghi chú C-9 trong EXCLUDE.
 ]);
 
 /**
