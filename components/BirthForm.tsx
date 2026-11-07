@@ -6,7 +6,7 @@ import { SHICHEN } from '@/lib/ziwei/constants';
 import { useTheme } from '@/components/ThemeProvider';
 import { PROVINCES } from '@/lib/ziwei/cities';
 import { formToBirthInfo, calcTrueSolarBranch } from '@/lib/ziwei/share';
-import { biFmt, biTerm, biText } from '@/lib/i18n/resolve';
+import { biFmt, biPlace, biTerm, biText, viPlace } from '@/lib/i18n/resolve';
 import Bi from './Bi';
 
 export interface BirthFormState {
@@ -126,7 +126,7 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
         biFmt('{y}年{m}月{d}日', {
           y, m: String(m).padStart(2, '0'), d: String(d).padStart(2, '0'),
         }).vi,
-        form.city || (form.province ? form.province : ''),
+        form.city || (form.province ? (viPlace(form.province) ?? form.province) : ''),
         form.unknownTime
           ? biText('时辰不详').vi
           : biTerm(SHICHEN_NAMES[branch] + '时', 'hour').vi,
@@ -309,8 +309,10 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
             onBlur={e => { e.target.style.borderColor = inputBorder; }}
           >
             <option value="">{biText('省份 / 直辖市').vi}</option>
+            {/* value vẫn là tên Hán (key tra cứu + dữ liệu lưu vào lá số); nhãn là bản Việt —
+                <option> không nhận phần tử con nên chỉvế .vi, giống các option khác của form. */}
             {PROVINCES.map(p => (
-              <option key={p.name} value={p.name}>{p.name}</option>
+              <option key={p.name} value={p.name}>{viPlace(p.name) ?? p.name}</option>
             ))}
           </select>
           <select
@@ -336,6 +338,13 @@ export default function BirthForm({ onSubmit, loading, initialData, onFormSave, 
               exit={{ opacity: 0 }}
               style={{ fontSize: '10px', color: isDark ? 'rgba(180,210,235,0.85)' : 'rgba(100,70,10,0.5)', marginTop: '5px' }}
             >
+              {/* Cùng hình dạng <Bi> đã dùng cho 12 canh giờ: vế Việt + span Hán nhỏ (bi-zh).
+                  Số kinh độ / lệch giờ KHÔNG đổi: ta chỉ thêm nhãn, offsetMin vẫn tính từ
+                  form.longitude — giá trị tra theo key Hán trong PROVINCES. */}
+              <span className="bi">
+                <span className="bi-vi" lang="vi">{biPlace(form.province).vi}</span>
+                <span className="bi-zh" lang="zh-Hans">{form.province}</span>
+              </span>{' · '}
               {form.city || biText('（请选择城市）').vi} · {biText('经度').vi} {form.longitude.toFixed(1)}°E · {biText('时差').vi} {offsetMin > 0 ? '+' : ''}{offsetMin} {biText('分钟').vi}
             </motion.p>
           ) : (

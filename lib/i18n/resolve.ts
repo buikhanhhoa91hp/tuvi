@@ -1,6 +1,7 @@
 import { GENERATED_TERMS } from './terms.generated';
 import { OVERRIDE_BY_ZH, pickOverride } from './terms.override';
 import { UI_FMT_VI, UI_VI } from './ui-phrases';
+import { PROVINCE_VI } from './place-vi';
 import type { BiPair, TermKind } from './terms.types';
 
 /**
@@ -98,4 +99,27 @@ export function biFmt(template: string, args: Record<string, string | number>): 
 
 export function hasPhrase(zh: string): boolean {
   return pick(UI_VI, zh) !== undefined || pick(UI_FMT_VI, zh) !== undefined;
+}
+
+// ─── Lớp địa danh (Task c6) — nhãn CHO 34 đơn vị cấp tỉnh, khóa tra không đổi ───
+
+/**
+ * Nhãn Việt của một địa danh cấp tỉnh. Bảng địa danh đi TRƯỚC, các tra cứu sẵn có
+ * (viTerm — phòng khi thuật ngữ generated/override có mục tên riêng) là fallback.
+ * CHỈ hiển thị: người gọi vẫn phải giữ nguyên chuỗi Hán làm key/value (form.province,
+ * `value=` của <option>, dữ liệu lưu vào lá số) — xem header lib/i18n/place-vi.ts.
+ * Pure: pick() có hasOwnProperty nên prototype key ('toString', '__proto__') không khớp;
+ * không mutable state cấp module, an toàn khi server rendering chạy đồng thời.
+ */
+export function viPlace(zh: string): string | undefined {
+  if (!zh) return undefined;
+  const fromTable = pick(PROVINCE_VI, zh);
+  if (fromTable) return fromTable;
+  return viTerm(zh);
+}
+
+/** Cặp hiển thị cho địa danh: vế Việt qua viPlace, vế Hán là chính chuỗi key. */
+export function biPlace(zh: string): BiPair {
+  const vi = viPlace(zh);
+  return vi ? { zh, vi, missing: false } : { zh, vi: zh, missing: true };
 }

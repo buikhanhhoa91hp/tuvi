@@ -25,6 +25,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { formToBirthInfo } from '../../lib/ziwei/share';
+import { PROVINCES } from '../../lib/ziwei/cities';
+import { PROVINCE_VI } from '../../lib/i18n/place-vi';
+import { viPlace } from '../../lib/i18n/resolve';
 import type { BirthFormState } from '../../components/BirthForm';
 
 const src = readFileSync(new URL('../../components/BirthForm.tsx', import.meta.url), 'utf8');
@@ -127,4 +130,69 @@ assert.deepEqual(
   '时辰不详时不应按晚子时换日',
 );
 
+// ── 4) Task c6: nhãn Việt 34 đơn vị cấp tỉnh KHÔNG được xoay chuyển khóa tra cứu ──
+// Bối cảnh: option tỉnh hiển thị nhãn Việt (Bắc Kinh…) nhưng form.province, `value=` và
+// chuỗi lưu vào lá số VẪN là tên Hán — vì PROVINCES.find(p => p.name === …) tra theo khóa
+// đó và offsetMin = round((longitude − 120) × 4) của giờ thật–mặt trời đọc longitude từ
+// phép tra ấy. Nếu một nhãn Việt lọt được vào làm key, lookup trả undefined → BirthForm
+// rơi về longitude 120 (mặc định) → giờ sinh của mọi lá số chọn tỉnh đó sai silently.
+// Các chốt dưới đây bảo đảm: bảng phủ đúng 34 tỉnh, không khóa thừa, tra ngược
+// nhãn→Hán→kinh độ cho cùng offsetMin như tra theo Hán, và nguồn vẫn dùng key Hán.
+const CJK = /[\u4e00-\u9fff]/;
+const zhNames = PROVINCES.map((p) => p.name);
+
+assert.equal(PROVINCES.length, 34, 'PROVINCES phải có đúng 34 đơn vị cấp tỉnh ( Task c6 đếm theo này)');
+assert.equal(Object.keys(PROVINCE_VI).length, 34, 'PROVINCE_VI phải có đúng 34 mục');
+
+// 4a. Mọi tên tỉnh Hán đều có nhãn Việt, nhãn không rỗng và không còn ký tự Hán.
+for (const n of zhNames) {
+  const vi = PROVINCE_VI[n];
+  assert.ok(typeof vi === 'string' && vi.trim() !== '', `thiếu nhãn Việt cho '${n}'`);
+  assert.ok(!CJK.test(vi), `nhãn '${vi}' của '${n}' vẫn chứa Hán tự`);
+}
+// 4b. KHÔNG khóa nào ngoài PROVINCES (chống mục thừa/sau khi dữ liệu Hán đổi tên).
+const orphanKeys = Object.keys(PROVINCE_VI).filter((k) => !zhNames.includes(k));
+assert.deepEqual(orphanKeys, [], `PROVINCE_VI có khóa không tồn tại trong PROVINCES: ${orphanKeys.join(', ')}`);
+// 4c. Nhãn không trùng nhau — hai tỉnh cùng một nhãn sẽ khiến tra ngược nhập nhằng.
+assert.equal(new Set(Object.values(PROVINCE_VI)).size, 34, 'nhãn Việt phải nhất quán 1-1 với tên Hán');
+
+// Cùng đường tra mà BirthForm dùng (handleProvince/handleCity): tên → cities[0].longitude,
+// thiếu tên thì mặc định 120 — đúng như `?? 120` trong component.
+const lonOfProvinceName = (name: string): number =>
+  PROVINCES.find((p) => p.name === name)?.cities[0]?.longitude ?? 120;
+const offsetMinOf = (lon: number): number => Math.round((lon - 120) * 4);
+
+// 4d. Với MỌI tỉnh: đi từ NHÃN Việt (đảo ngược bảng) về khóa Hán rồi tra longitude cho
+//     cùng offsetMin như tra thẳng bằng tên Hán. Đây chính là bất biến "đổi nhãn không
+//     đổi giờ": label không nằm trên đường tính số, và khóa không đổi nên không lệch 120.
+for (const n of zhNames) {
+  const vi = PROVINCE_VI[n];
+  const backToZh = zhNames.find((z) => PROVINCE_VI[z] === vi);
+  assert.equal(backToZh, n, `nhãn '${vi}' không tra ngược về đúng '${n}'`);
+  assert.equal(offsetMinOf(lonOfProvinceName(backToZh!)), offsetMinOf(lonOfProvinceName(n)),
+    `offsetMin qua nhãn '${vi}' khác với qua tên '${n}'`);
+}
+// viPlace() — API mà component gọi — phải trả đúng nhãn (không rơi sang viTerm).
+for (const n of zhNames) assert.equal(viPlace(n), PROVINCE_VI[n], `viPlace('${n}') !== PROVINCE_VI`);
+
+// 4e. Số chốt (trước-c6 = sau-c6, vì cities.ts không bị sờ tới): 北京市 116.4 → −14,
+//     广东省 113.3 → −27, 新疆维吾尔自治区 87.6 → −130. Nếu ai đó sửa cities.ts
+//     làm kinh độ đổi, những dòng này báo — đó là chủ đích (số phải có lý do).
+assert.equal(offsetMinOf(lonOfProvinceName('北京市')), -14, "offsetMin 北京市 phải là -14 (như trước Task c6)");
+assert.equal(offsetMinOf(lonOfProvinceName('广东省')), -27, "offsetMin 广东省 phải là -27 (như trước Task c6)");
+assert.equal(offsetMinOf(lonOfProvinceName('新疆维吾尔自治区')), -130, "offsetMin 新疆 phải là -130 (như trước Task c6)");
+
+// 4f. Nguồn BirthForm vẫn dùng TÊN HÁN làm key/value, chỉ ĐỔI NHÃN:
+//     - `value={p.name}` và `key={p.name}` trên option tỉnh;
+//     - lookup `PROVINCES.find(p => p.name === form.province)` / `=== prov` giữ nguyên;
+//     - label đi qua viPlace(p.name).
+assert.match(src, /<option key=\{p\.name\} value=\{p\.name\}>\{viPlace\(p\.name\) \?\? p\.name\}<\/option>/,
+  'option tỉnh phải: value=key=tên Hán, label=viPlace(name)');
+assert.match(src, /PROVINCES\.find\(p => p\.name === form\.province\)/,
+  'BirthForm phải tiếp tục tra PROVINCES bằng form.province (chuỗi Hán)');
+assert.match(src, /PROVINCES\.find\(p => p\.name === prov\)/,
+  'handleProvince phải tiếp tục tra bằng đúng tên Hán được chọn');
+
 console.log('✅ BirthForm→BirthInfo 转换一致性：单一实现 + 晚子时边界（跨月/跨年）均正确');
+console.log('✅ Task c6: 34 nhãn tỉnh tiếng Việt phủ đủ, khóa Hán và offsetMin (kinh độ→giờ thật) không đổi');
+process.exit(0);
